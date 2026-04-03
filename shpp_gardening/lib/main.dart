@@ -8,6 +8,8 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -41,6 +43,8 @@ class TrackedPlant {
 
 // --- 2. HOME PAGE (STATEFUL) ---
 class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
   @override
   _HomePageState createState() => _HomePageState();
 }
@@ -93,14 +97,14 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     // We define this INSIDE the build method so it can see trackedPlants and _handleTracking
-    final List<Widget> _widgetOptions = [
+    final List<Widget> widgetOptions = [
       HomeScreen(tracked: trackedPlants), 
       InfoScreen(onTrack: _handleTracking),
       QuizScreen(),
     ];
 
     return Scaffold(
-      body: _widgetOptions.elementAt(_selectedIndex),
+      body: widgetOptions.elementAt(_selectedIndex),
       bottomNavigationBar: BottomNavigationBar(
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
@@ -117,6 +121,8 @@ class _HomePageState extends State<HomePage> {
 
 // --- PLACEHOLDER QUIZ SCREEN ---
 class QuizScreen extends StatelessWidget {
+  const QuizScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return const Scaffold(body: Center(child: Text('Quiz Screen')));

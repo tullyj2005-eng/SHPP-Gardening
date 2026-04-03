@@ -13,7 +13,7 @@ class HomeScreen extends StatelessWidget {
         children: [
           // --- SIDEBAR (Account & Settings) ---
           Container(
-            width: 250, 
+            width: 150, 
             color: Colors.green.shade50,
             child: Column(
               children: [
