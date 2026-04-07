@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
 import 'InfoScreen.dart';
 import 'dart:async'; 
-import 'HomePage.dart'; // Ensure this points to where HomeScreen is defined
+import 'HomePage.dart'; 
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // ADD THIS IMPORT
+import 'firebase_options.dart';
+import 'AccountLogic.dart';
 
-void main() {
-  runApp(MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -16,12 +24,12 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'SHPP Gardening',
       theme: ThemeData(primarySwatch: Colors.green),
-      home: HomePage(),
+      home: const HomePage(),
     );
   }
 }
 
-// --- 1. DATA MODEL (Fixed brackets and logic) ---
+// --- DATA MODEL ---
 class TrackedPlant {
   final String name;
   final DateTime lastWatered;
@@ -33,7 +41,6 @@ class TrackedPlant {
     this.thirstDuration = const Duration(hours: 6),
   });
 
-  // This calculates the progress percentage (0.0 to 1.0)
   double get waterProgress {
     final timePassed = DateTime.now().difference(lastWatered);
     double progress = timePassed.inSeconds / thirstDuration.inSeconds;
@@ -41,9 +48,10 @@ class TrackedPlant {
   }
 }
 
-// --- 2. HOME PAGE (STATEFUL) ---
+// --- THE MAIN WRAPPER ---
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final String? userRole; 
+  const HomePage({super.key, this.userRole});
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -51,17 +59,15 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
-  
-  // This list must be inside the State class
-  List<TrackedPlant> trackedPlants = [];
+  List<TrackedPlant> localTrackedPlants = []; // Used for guest mode
   Timer? _trackerTimer;
 
   @override
   void initState() {
     super.initState();
-    // Refresh the UI every second to update the progress bars
+    // This timer ensures the progress bars update every second
     _trackerTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (mounted && trackedPlants.isNotEmpty) {
+      if (mounted) {
         setState(() {}); 
       }
     });
@@ -73,58 +79,62 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
-  // Logic to add a new plant
-  void _handleTracking(String plantName) {
-    setState(() {
-      bool alreadyExists = trackedPlants.any((p) => p.name == plantName);
-      if (!alreadyExists) {
-        trackedPlants.add(TrackedPlant(
-          name: plantName, 
-          lastWatered: DateTime.now(), 
-          thirstDuration: const Duration(hours: 6), 
-        ));
-        _selectedIndex = 0; // Redirect to Home tab
+  void _handleTracking(String plantName) async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      // Permanently save to Firebase
+      await AccountLogic().addPlantToFirebase(plantName);
+      // Switch to Home tab to see the result
+      setState(() => _selectedIndex = 0);
+    } else {
+      // Guest Mode: Save to local list
+      setState(() {
+        if (!localTrackedPlants.any((p) => p.name == plantName)) {
+          localTrackedPlants.add(TrackedPlant(
+            name: plantName, 
+            lastWatered: DateTime.now(),
+          ));
+        }
+        _selectedIndex = 0; 
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, authSnapshot) {
+        final isLoggedIn = authSnapshot.hasData;
+
+        // If logged in, we use the Firebase Stream. If guest, we use the local list.
+        return StreamBuilder<List<TrackedPlant>>(
+          stream: isLoggedIn ? AccountLogic().getMyGarden() : Stream.value(localTrackedPlants),
+          builder: (context, plantSnapshot) {
+            final currentPlants = plantSnapshot.data ?? localTrackedPlants;
+
+            final List<Widget> widgetOptions = [
+              HomeScreen(tracked: currentPlants, userRole: widget.userRole), 
+              InfoScreen(onTrack: _handleTracking),
+              const Center(child: Text("Quiz Section")),
+            ];
+
+            return Scaffold(
+              body: widgetOptions.elementAt(_selectedIndex),
+              bottomNavigationBar: BottomNavigationBar(
+                items: const [
+                  BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+                  BottomNavigationBarItem(icon: Icon(Icons.info), label: 'Info'),
+                ],
+                currentIndex: _selectedIndex,
+                selectedItemColor: Colors.green,
+                onTap: (index) => setState(() => _selectedIndex = index),
+              ),
+            );
+          }
+        );
       }
-    });
-  }
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // We define this INSIDE the build method so it can see trackedPlants and _handleTracking
-    final List<Widget> widgetOptions = [
-      HomeScreen(tracked: trackedPlants), 
-      InfoScreen(onTrack: _handleTracking),
-      QuizScreen(),
-    ];
-
-    return Scaffold(
-      body: widgetOptions.elementAt(_selectedIndex),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.info), label: 'Info'),
-          BottomNavigationBarItem(icon: Icon(Icons.quiz), label: 'Quiz'),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.green,
-        onTap: _onItemTapped,
-      ),
     );
-  }
-}
-
-// --- PLACEHOLDER QUIZ SCREEN ---
-class QuizScreen extends StatelessWidget {
-  const QuizScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(body: Center(child: Text('Quiz Screen')));
   }
 }
