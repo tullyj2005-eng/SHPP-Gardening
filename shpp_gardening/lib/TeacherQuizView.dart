@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'AccountLogic.dart';
 import 'QuizData.dart';
+import 'quiz_overlay.dart';
 
 class TeacherQuizView extends StatelessWidget {
   final String classCode; // Pass this from HomeScreen
@@ -38,6 +39,22 @@ class TeacherQuizView extends StatelessWidget {
                     padding: const EdgeInsets.all(8),
                     child: Column(
                       children: [
+                        // Under your "Send to Class" button or as an IconButton at the top
+IconButton(
+  icon: const Icon(Icons.play_circle_fill, color: Colors.green),
+  onPressed: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        fullscreenDialog: true,
+        builder: (context) => QuizOverlay(
+          questions: quizBank[index].questions,
+          userRole: 'Teacher',
+        ),
+      ),
+    );
+  },
+),
                         Text(quizBank[index].title, textAlign: TextAlign.center),
                         const Spacer(),
                         ElevatedButton(
