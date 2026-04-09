@@ -54,7 +54,7 @@ Widget mint(BuildContext context, VoidCallback onTrack) {
 
 //ROSEMARY
 // mint
-Widget Rosemary(BuildContext context, VoidCallback onTrack) {
+Widget rosemary(BuildContext context, VoidCallback onTrack) {
   const String plantName = "Rosemary";
   
   const List<String> descriptionText = [

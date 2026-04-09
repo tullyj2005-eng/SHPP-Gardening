@@ -8,9 +8,6 @@ packages:
       sha256: f698de6eb8a0dd7a9a931bbfe13568e8b77e702eb2deb13dd83480c5373e7746
       url: "https://pub.dev"
     source: hosted
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     version: "1.3.68"
   args:
     dependency: transitive
@@ -20,15 +17,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.7.0"
-=======
-    version: "1.3.59"
->>>>>>> parent of 98040659 (Added features)
-=======
-    version: "1.3.59"
->>>>>>> parent of 98040659 (Added features)
-=======
-    version: "1.3.59"
->>>>>>> parent of 98040659 (Added features)
   async:
     dependency: transitive
     description:
@@ -62,7 +50,7 @@ packages:
     source: hosted
     version: "1.1.2"
   cloud_firestore:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: cloud_firestore
       sha256: "2e0a07b9905375fa17fba82ee1cd70df592907691e2f25a629823a021e49c1a2"
@@ -110,7 +98,7 @@ packages:
     source: hosted
     version: "1.3.3"
   firebase_auth:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: firebase_auth
       sha256: "7421650001840aa63d3e7a59062bfa1a53febc52c7520e1effad0d325d6469cb"
@@ -134,7 +122,7 @@ packages:
     source: hosted
     version: "6.1.4"
   firebase_core:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: firebase_core
       sha256: "2f988dab915efde3b3105268dbd69efce0e8570d767a218ccd914afd0c10c8cc"
@@ -188,6 +176,30 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  functions_framework:
+    dependency: "direct main"
+    description:
+      name: functions_framework
+      sha256: e40725fd249690d97319a2e96a0ef82f0510dffc6c99e22a0ebde4a26bddd7a9
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.4.3+1"
+  google_cloud:
+    dependency: transitive
+    description:
+      name: google_cloud
+      sha256: "2fa5d1adf3939ac6e7130ae84de40727efea9d0e08db2e3d7fea3b8b432d741c"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.0"
+  http:
+    dependency: transitive
+    description:
+      name: http
+      sha256: "87721a4a50b19c7f1d49001e51409bddc46303966ce89a65af4f4e6004896412"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.6.0"
   http_parser:
     dependency: transitive
     description:
@@ -196,6 +208,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.1.2"
+  io:
+    dependency: transitive
+    description:
+      name: io
+      sha256: dfd5a80599cf0165756e3181807ed3e77daf6dd4137caaad72d0b7931597650b
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.5"
+  json_annotation:
+    dependency: transitive
+    description:
+      name: json_annotation
+      sha256: cb09e7dac6210041fad964ed7fbee004f14258b4eca4040f72d1234062ace4c8
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.11.0"
   leak_tracker:
     dependency: transitive
     description:
@@ -268,6 +296,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.8"
+  shelf:
+    dependency: "direct main"
+    description:
+      name: shelf
+      sha256: e7dd780a7ffb623c57850b33f43309312fc863fb6aa3d276a754bb299839ef12
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.4.2"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -386,16 +422,5 @@ packages:
     source: hosted
     version: "3.24.2"
 sdks:
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-  dart: ">=3.9.0 <4.0.0"
-  flutter: ">=3.35.0"
-=======
-=======
->>>>>>> parent of 98040659 (Added features)
-=======
->>>>>>> parent of 98040659 (Added features)
   dart: ">=3.11.4 <4.0.0"
-  flutter: ">=3.22.0"
->>>>>>> parent of 98040659 (Added features)
+  flutter: ">=3.35.0"

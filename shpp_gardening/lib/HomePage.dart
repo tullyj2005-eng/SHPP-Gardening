@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+// Ensure these filenames match your actual project files exactly
 import 'main.dart'; 
 import 'LoginPage.dart'; 
 import 'TeacherQuizView.dart';
 import 'StudentQuizView.dart';
 import 'AccountLogic.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 class HomeScreen extends StatefulWidget {
   final List<TrackedPlant> tracked;
@@ -18,7 +20,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  // We move the controller here so it persists during rebuilds
   final TextEditingController _codeController = TextEditingController();
   bool _isProcessing = false;
 
@@ -27,7 +28,6 @@ class _HomeScreenState extends State<HomeScreen> {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null || widget.userRole == null) return;
 
-    // 1. Fetch the user's document to get their specific code
     DocumentSnapshot userDoc = await FirebaseFirestore.instance
         .collection('users')
         .doc(user.uid)
@@ -35,11 +35,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
     if (!userDoc.exists) return;
 
-    // 2. Get the code based on role
     // Teachers use 'myClassCode', Students use 'classCode'
     String code = widget.userRole == 'Teacher' 
-        ? userDoc.get('myClassCode') ?? "" 
-        : userDoc.get('classCode') ?? "";
+        ? (userDoc.data() as Map<String, dynamic>)['myClassCode'] ?? "" 
+        : (userDoc.data() as Map<String, dynamic>)['classCode'] ?? "";
 
     if (code.isEmpty && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -48,7 +47,6 @@ class _HomeScreenState extends State<HomeScreen> {
       return;
     }
 
-    // 3. Navigate and pass the required 'classCode'
     if (mounted) {
       Navigator.push(
         context,
@@ -63,7 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
-    _codeController.dispose(); // Always clean up controllers
+    _codeController.dispose();
     super.dispose();
   }
 
@@ -121,7 +119,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
 
-              // --- GARDEN CONTENT + CLASSROOM SLOT ---
+              // --- MAIN CONTENT ---
               Expanded(
                 child: Scaffold(
                   appBar: AppBar(title: const Text("My Garden"), elevation: 0),
@@ -139,43 +137,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                   final plant = widget.tracked[index];
                                   return Card(
                                     margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-                                    child: InkWell(
-                                      onTap: () {
-                                        // Specific logic for Rosemary
-                                        if (plant.name == 'Rosemary') {
-                                          rosemary(context, () {}); // Passing empty callback since already tracked
-                                        }
-                                        else if(plant.name.contains("Mint")) {
-                                          mint(context, () {});
-                                        }
-                                        else if (plant.name.contains("Oregano")) {
-                                          oregano(context, () {});
-                                        }
-                                      },
-                                      child: ListTile(
-                                        title: Text(plant.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                                        subtitle: Text("Progress: ${(plant.waterProgress * 100).toInt()}%"),
-                                        trailing: const Icon(Icons.water_drop, color: Colors.blue),
-                                      ),
-=======
-=======
->>>>>>> parent of 98040659 (Added features)
-=======
->>>>>>> parent of 98040659 (Added features)
                                     child: ListTile(
                                       title: Text(plant.name, style: const TextStyle(fontWeight: FontWeight.bold)),
                                       subtitle: Text("Progress: ${(plant.waterProgress * 100).toInt()}%"),
                                       trailing: const Icon(Icons.water_drop, color: Colors.blue),
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> parent of 98040659 (Added features)
-=======
->>>>>>> parent of 98040659 (Added features)
-=======
->>>>>>> parent of 98040659 (Added features)
+                                      onTap: () {
+                                        // Detail view logic here
+                                      },
                                     ),
                                   );
                                 },
