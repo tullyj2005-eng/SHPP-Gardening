@@ -54,7 +54,7 @@ Widget mint(BuildContext context, VoidCallback onTrack) {
 
 //ROSEMARY
 // mint
-Widget rosemary(BuildContext context, VoidCallback onTrack) {
+Widget Rosemary(BuildContext context, VoidCallback onTrack) {
   const String plantName = "Rosemary";
   
   const List<String> descriptionText = [
@@ -85,49 +85,6 @@ Widget rosemary(BuildContext context, VoidCallback onTrack) {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Image.asset('ROSEMARY.jpg', width: 150, height: 150, fit: BoxFit.contain),
-          ),
-          const Text(
-            plantName,
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 10),
-        ],
-      ),
-    ),
-  );
-}
-
-// --- PLANT DETAILS POP-UP ---
-Widget oregano(BuildContext context, VoidCallback onTrack) {
-  const String plantName = "Oregano";
-  
-  const List<String> descriptionText = [
-      "Το δίκταμο, γνωστό και ως <<δίκταμο της Κρήτης>> , είναι ένας μικρός αρωματικός θάμνος με στρογγυλά φύλλα και όμορφα και όμορφα ροζ/μωβ άνθη το καλοκαίρι. Αγαπά τις ηλιόλουστες τοποθεσίες και χρειάζεται λίγο πότισμα. Αντέχει τις χαμηλές θερμοκρασίες του χειμώνα, γεγονός που το καθιστά ιδανικό, τόσο για την καλλιέργεια στον αγρό, όσο και για χρήση στο μπαλκόνι. Μπορεί να χρησιμοποιηθεί στο φαγητό, σε σαλάτες και ψητά αντί για ρίγανη (και τα άθη και τα φυτά). Συνιστά, επίσης, ως αφέψημα για τις καταπραϋντικές του ιδιότητες.\n\n",
-            ]; // Joins the list into a single string with double line breaks
-
-
-  const String howToText = 
-      ": Ξηροφυτικό είδος χωρίς ιδιιαίτερες ανάγκες σε πότισμα. Απαιτεί μερική ή πληρη έκθεση στο φως του ηλίου. Δεν υπάρχουν ιδιαίτερες απαιτήσεις στο έδαφος, αρκεί να υπάρχει καλή αποστράγγιση για την απομάκρυνση του νερού. Είναι ανθεκτικό σε φτωχά και πετρώδη περιβάλλοντα. ";
-
-  return InkWell(
-    onTap: () {
-      showPlantDetails(
-        context, 
-        'Oregano', 
-        descriptionText.join('\n\n'), 
-        howToText, 
-        onTrack // Pass it here
-      );
-    },
-    child: Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Image.asset('ORIGANUM DICTAMNUS.jpg', width: 150, height: 150, fit: BoxFit.contain),
           ),
           const Text(
             plantName,

@@ -6,7 +6,6 @@ import 'TeacherQuizView.dart';
 import 'StudentQuizView.dart';
 import 'AccountLogic.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'Plants.dart';
 
 class HomeScreen extends StatefulWidget {
   final List<TrackedPlant> tracked;
@@ -19,13 +18,16 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  // We move the controller here so it persists during rebuilds
   final TextEditingController _codeController = TextEditingController();
   bool _isProcessing = false;
 
+  // Helper to fetch the code and open the correct view
   void _openQuiz(BuildContext context) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null || widget.userRole == null) return;
 
+    // 1. Fetch the user's document to get their specific code
     DocumentSnapshot userDoc = await FirebaseFirestore.instance
         .collection('users')
         .doc(user.uid)
@@ -33,6 +35,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
     if (!userDoc.exists) return;
 
+    // 2. Get the code based on role
+    // Teachers use 'myClassCode', Students use 'classCode'
     String code = widget.userRole == 'Teacher' 
         ? userDoc.get('myClassCode') ?? "" 
         : userDoc.get('classCode') ?? "";
@@ -44,6 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
       return;
     }
 
+    // 3. Navigate and pass the required 'classCode'
     if (mounted) {
       Navigator.push(
         context,
@@ -58,7 +63,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
-    _codeController.dispose();
+    _codeController.dispose(); // Always clean up controllers
     super.dispose();
   }
 
@@ -72,6 +77,7 @@ class _HomeScreenState extends State<HomeScreen> {
         return Scaffold(
           body: Row(
             children: [
+              // --- SIDEBAR ---
               Container(
                 width: 200,
                 color: Colors.green.shade50,
@@ -115,6 +121,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
 
+              // --- GARDEN CONTENT + CLASSROOM SLOT ---
               Expanded(
                 child: Scaffold(
                   appBar: AppBar(title: const Text("My Garden"), elevation: 0),
@@ -132,6 +139,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   final plant = widget.tracked[index];
                                   return Card(
                                     margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+<<<<<<< HEAD
                                     child: InkWell(
                                       onTap: () {
                                         // Specific logic for Rosemary
@@ -150,6 +158,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                         subtitle: Text("Progress: ${(plant.waterProgress * 100).toInt()}%"),
                                         trailing: const Icon(Icons.water_drop, color: Colors.blue),
                                       ),
+=======
+                                    child: ListTile(
+                                      title: Text(plant.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                                      subtitle: Text("Progress: ${(plant.waterProgress * 100).toInt()}%"),
+                                      trailing: const Icon(Icons.water_drop, color: Colors.blue),
+>>>>>>> parent of 98040659 (Added features)
                                     ),
                                   );
                                 },

@@ -46,10 +46,6 @@ class TrackedPlant {
     double progress = timePassed.inSeconds / thirstDuration.inSeconds;
     return progress.clamp(0.0, 1.0);
   }
-
-  onClick() {
-    // When clicked I want to make sure it spawns a widget with the plant information
-  }
 }
 
 // --- THE MAIN WRAPPER ---

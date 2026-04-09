@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'quiz_overlay.dart';
-
 
 class StudentQuizView extends StatelessWidget {
   final String classCode;
@@ -29,19 +27,9 @@ class StudentQuizView extends StatelessWidget {
                 title: Text(doc['title']),
                 trailing: const Icon(Icons.play_arrow, color: Colors.green),
                 onTap: () {
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      fullscreenDialog: true,
-      builder: (context) => QuizOverlay(
-        questions: List<Map<String, dynamic>>.from(doc['questions']),
-        userRole: 'Student',
-        quizId: doc.id,
-        classCode: classCode,
-      ),
-    ),
-  );
-},
+                  // Here you would navigate to a 'TakingQuizView' 
+                  // passing the doc['questions'] and doc['title']
+                },
               );
             }).toList(),
           );
