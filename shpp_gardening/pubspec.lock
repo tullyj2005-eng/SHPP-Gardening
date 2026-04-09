@@ -10,6 +10,7 @@ packages:
     source: hosted
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     version: "1.3.68"
   args:
     dependency: transitive
@@ -19,6 +20,9 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.7.0"
+=======
+    version: "1.3.59"
+>>>>>>> parent of 98040659 (Added features)
 =======
     version: "1.3.59"
 >>>>>>> parent of 98040659 (Added features)
@@ -384,9 +388,12 @@ packages:
 sdks:
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   dart: ">=3.9.0 <4.0.0"
   flutter: ">=3.35.0"
 =======
+=======
+>>>>>>> parent of 98040659 (Added features)
 =======
 >>>>>>> parent of 98040659 (Added features)
   dart: ">=3.11.4 <4.0.0"

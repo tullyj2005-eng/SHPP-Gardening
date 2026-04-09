@@ -141,6 +141,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                                     child: InkWell(
                                       onTap: () {
                                         // Specific logic for Rosemary
@@ -162,11 +163,16 @@ class _HomeScreenState extends State<HomeScreen> {
 =======
 =======
 >>>>>>> parent of 98040659 (Added features)
+=======
+>>>>>>> parent of 98040659 (Added features)
                                     child: ListTile(
                                       title: Text(plant.name, style: const TextStyle(fontWeight: FontWeight.bold)),
                                       subtitle: Text("Progress: ${(plant.waterProgress * 100).toInt()}%"),
                                       trailing: const Icon(Icons.water_drop, color: Colors.blue),
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> parent of 98040659 (Added features)
+=======
 >>>>>>> parent of 98040659 (Added features)
 =======
 >>>>>>> parent of 98040659 (Added features)

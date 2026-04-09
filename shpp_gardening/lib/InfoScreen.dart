@@ -67,9 +67,14 @@ class _InfoScreenState extends State<InfoScreen> {
                       // 3. USE 'widget.onTrack' HERE: This reaches up to the main class
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                       mint(context, () => widget.onTrack('Mojito Mint')),
                       rosemary(context, () => widget.onTrack('Rosemary')),
                       oregano(context, () => widget.onTrack('Oregano')),
+=======
+                      mojitoMintPlant(context, () => widget.onTrack('Mojito Mint')),
+                      Rosemary(context, () => widget.onTrack('Rosemary')),
+>>>>>>> parent of 98040659 (Added features)
 =======
                       mojitoMintPlant(context, () => widget.onTrack('Mojito Mint')),
                       Rosemary(context, () => widget.onTrack('Rosemary')),
