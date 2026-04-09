@@ -57,7 +57,7 @@ class _RegisterPageState extends State<RegisterPage> {
             
             // ROLE DROPDOWN
             DropdownButtonFormField<String>(
-              value: _selectedRole,
+              initialValue: _selectedRole,
               decoration: const InputDecoration(labelText: "Register as"),
               items: ['Student', 'Teacher'].map((role) {
                 return DropdownMenuItem(value: role, child: Text(role));

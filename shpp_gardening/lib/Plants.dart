@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 
 
 // mint
-Widget mojitoMintPlant(BuildContext context, VoidCallback onTrack) {
-  const String plantName = "Mojito Mint";
+Widget mint(BuildContext context, VoidCallback onTrack) {
+  const String plantName = "Mint";
   
   const List<String> descriptionText = [
       "Mojito mint (Mentha rotundifolia), like almost all mint species, is a perennial plant. It is one of the most widely distributed mint species, both for cultivation and ornamental use. It loves rich, moist soils and sunny locations, and needs protection from frosts. Because of its sweet,  fruity taste, it is the most popular choice of mint for cooking, making herbal teas and the well-known drink from which it takes its name. Its leaves can also be used to make refreshing drinks in the summer.\n\n",

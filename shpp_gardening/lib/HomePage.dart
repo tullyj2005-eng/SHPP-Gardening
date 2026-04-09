@@ -135,13 +135,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                     child: InkWell(
                                       onTap: () {
                                         // Specific logic for Rosemary
-                                        if (plant.name.contains("rosemary")) {
-                                          rosemary(context, () {});
-                                        } 
-                                        else if(plant.name.contains("Mojito Mint")) {
-                                          mojitoMintPlant(context, () {});
+                                        if (plant.name == 'Rosemary') {
+                                          rosemary(context, () {}); // Passing empty callback since already tracked
                                         }
-                                        mojitoMintPlant(context, () {});
+                                        else if(plant.name.contains("Mint")) {
+                                          mint(context, () {});
+                                        }
+                                        else if (plant.name.contains("Oregano")) {
+                                          oregano(context, () {});
+                                        }
                                       },
                                       child: ListTile(
                                         title: Text(plant.name, style: const TextStyle(fontWeight: FontWeight.bold)),

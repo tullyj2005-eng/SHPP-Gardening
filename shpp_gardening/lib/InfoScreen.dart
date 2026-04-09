@@ -65,7 +65,7 @@ class _InfoScreenState extends State<InfoScreen> {
                     ),
                     _buildResponsiveGrid(constraints.maxWidth, [
                       // 3. USE 'widget.onTrack' HERE: This reaches up to the main class
-                      mojitoMintPlant(context, () => widget.onTrack('Mojito Mint')),
+                      mint(context, () => widget.onTrack('Mojito Mint')),
                       rosemary(context, () => widget.onTrack('Rosemary')),
                       oregano(context, () => widget.onTrack('Oregano')),
                     ]),
