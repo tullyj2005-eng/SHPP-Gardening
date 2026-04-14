@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'AccountLogic.dart';
+import 'account_logic.dart';
 import 'main.dart';
 
 class RegisterPage extends StatefulWidget {

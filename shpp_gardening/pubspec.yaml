@@ -5,7 +5,7 @@ publish_to: 'none'
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.11.4
+  sdk: '>=3.5.0 <4.0.0'
 
 dependencies:
   flutter:
@@ -13,24 +13,20 @@ dependencies:
 
   cupertino_icons: ^1.0.8
   
-  # Core Firebase (Essential for Login & Database)
-  firebase_core: ^4.6.0
-  firebase_auth: ^6.3.0
-  cloud_firestore: ^6.2.0
+  # Core Firebase
+  firebase_core: ^3.1.1       # Stable version for your current setup
+  firebase_auth: ^5.1.1
+  cloud_firestore: ^5.0.2
   
   # Additional Features
   webview_flutter: ^4.13.1
-  firebase_functions: ^0.0.1-dev  # Updated from dev version for stability
-  functions_framework: any
-  shelf: any
-
-dev_dependencies:
-  flutter_test:
-    sdk: flutter
-  flutter_lints: ^6.0.0
+  firebase_functions: ^0.0.1-dev
 
 flutter:
   uses-material-design: true
-
   assets:
     - assets/
+
+
+
+  
