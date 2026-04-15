@@ -155,3 +155,36 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
+
+
+// --- LEVEL CALCULATION ---
+class LevelCalculator {
+  // Define how much XP is needed for each level
+  static const int xpPerLevel = 100;
+
+  /// Calculates the current level based on total XP.
+  /// Example: 0-99 XP = Level 1, 100-199 XP = Level 2.
+  static int getLevel(int totalXP) {
+    if (totalXP < 0) return 1;
+    return (totalXP / xpPerLevel).floor() + 1;
+  }
+
+  /// Calculates the progress (0.0 to 1.0) towards the NEXT level.
+  /// This is used directly by the LinearProgressIndicator 'value' property.
+  static double getLevelProgress(int totalXP) {
+    if (totalXP < 0) return 0.0;
+    
+    // Get the remainder of XP after accounting for completed levels
+    int xpInCurrentLevel = totalXP % xpPerLevel;
+    
+    // Return as a decimal (e.g., 45 XP / 100 = 0.45)
+    return xpInCurrentLevel / xpPerLevel;
+  }
+
+  /// Optional: Calculates how much XP is left until the next level.
+  /// Useful if you want to show a "50 XP until Level 3" label.
+  static int xpUntilNextLevel(int totalXP) {
+    int xpInCurrentLevel = totalXP % xpPerLevel;
+    return xpPerLevel - xpInCurrentLevel;
+  }
+}

@@ -8,7 +8,6 @@ import 'student_quiz_view.dart';
 import 'account_logic.dart';
 import 'plant_detail_view.dart'; 
 import 'settings_page_view.dart';
-import 'settings_logic.dart'; // NEW IMPORT
 
 class HomeScreen extends StatefulWidget {
   final List<TrackedPlant> tracked;
@@ -21,7 +20,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  // --- Helper to confirm and delete plant ---
+  final AccountLogic _account = AccountLogic();
+
   void _confirmDelete(BuildContext context, TrackedPlant plant) {
     showDialog(
       context: context,
@@ -35,8 +35,8 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           TextButton(
             onPressed: () async {
-              await AccountLogic().removePlantFromGarden(plant.name);
-              if (context.mounted) Navigator.pop(context);
+              await _account.removePlantFromGarden(plant.name);
+              if (mounted) Navigator.pop(context);
             },
             child: const Text("Remove", style: TextStyle(color: Colors.red)),
           ),
@@ -109,12 +109,37 @@ class _HomeScreenState extends State<HomeScreen> {
                           user == null ? "Sign In" : "Active User",
                           style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                         ),
-                        if (user != null)
+                        if (user != null) ...[
                           Text(
                             user.email ?? "",
                             style: const TextStyle(color: Colors.white70, fontSize: 11),
                             overflow: TextOverflow.ellipsis,
                           ),
+                          const SizedBox(height: 15),
+                          // --- MINI XP BAR IN SIDEBAR ---
+                          StreamBuilder<int>(
+                            stream: _account.getUserXP(),
+                            builder: (context, snapshot) {
+                              final xp = snapshot.data ?? 0;
+                              final progress = LevelCalculator.getLevelProgress(xp);
+                              return Column(
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: LinearProgressIndicator(
+                                      value: progress,
+                                      minHeight: 6,
+                                      backgroundColor: Colors.white24,
+                                      valueColor: const AlwaysStoppedAnimation<Color>(Colors.orangeAccent),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text("Growth Progress", style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 9)),
+                                ],
+                              );
+                            },
+                          ),
+                        ],
                       ],
                     ),
                   ),
@@ -127,8 +152,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     title: const Text("Garden Quiz", style: TextStyle(fontSize: 14)),
                     onTap: () => _openQuiz(context),
                   ),
-                  
-                  // --- STEP 4: ADDED SETTINGS BUTTON ---
                   ListTile(
                     leading: const Icon(Icons.settings, color: Colors.blueGrey),
                     title: const Text("Settings", style: TextStyle(fontSize: 14)),
@@ -139,8 +162,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       );
                     },
                   ),
-                  // -------------------------------------
-
                   ListTile(
                     leading: const Icon(Icons.logout, color: Colors.redAccent),
                     title: const Text("Logout", style: TextStyle(fontSize: 14)),
@@ -162,10 +183,33 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Padding(
-                  padding: EdgeInsets.fromLTRB(24, 40, 24, 10),
-                  child: Text("My Garden", 
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.w400)),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 40, 24, 10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text("My Garden", 
+                        style: TextStyle(fontSize: 22, fontWeight: FontWeight.w400)),
+                      // --- LEVEL BADGE NEXT TO TITLE ---
+                      if (user != null)
+                        StreamBuilder<int>(
+                          stream: _account.getUserXP(),
+                          builder: (context, snapshot) {
+                            final level = LevelCalculator.getLevel(snapshot.data ?? 0);
+                            return Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: Colors.orange.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(color: Colors.orange),
+                              ),
+                              child: Text("LVL $level", 
+                                style: const TextStyle(color: Colors.orange, fontWeight: FontWeight.bold, fontSize: 12)),
+                            );
+                          },
+                        ),
+                    ],
+                  ),
                 ),
 
                 if (user != null && widget.userRole != null)

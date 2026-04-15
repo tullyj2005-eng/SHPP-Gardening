@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'account_logic.dart';
-import 'student_quiz_view.dart';
-import 'quiz_play_view.dart'; //
-import 'quiz_data.dart'; //
+import 'quiz_play_view.dart';
+import 'quiz_data.dart';
+import 'quiz_model.dart';
 
 class TeacherQuizView extends StatefulWidget {
   final String classCode;
@@ -16,20 +16,34 @@ class TeacherQuizView extends StatefulWidget {
 
 class _TeacherQuizViewState extends State<TeacherQuizView> {
   
-  // Posts a quiz from the central bank to this specific class
-  void _postFromBank(QuizModel quiz) async {
+  // Posts a quiz containing multiple questions to the specific classroom
+  void _postFromBank(Quiz quiz) async {
+    // We must convert the Question objects into Maps for Firestore
+    final List<Map<String, dynamic>> serializedQuestions = quiz.questions.map((q) {
+      return {
+        'questionText': q.questionText,
+        'type': q.type,
+        'correctAnswer': q.correctAnswer,
+        'options': q.options,
+      };
+    }).toList();
+
     final quizData = {
       'title': quiz.title,
-      'type': quiz.type,
-      'questions': quiz.questions,
+      'questions': serializedQuestions,
+      'postedAt': FieldValue.serverTimestamp(),
     };
     
-    await AccountLogic().postQuizToClass(widget.classCode, quizData);
-    if (mounted) {
-      Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Posted ${quiz.title} to class!")),
-      );
+    try {
+      await AccountLogic().postQuizToClass(widget.classCode, quizData);
+      if (mounted) {
+        Navigator.pop(context); // Close the selection dialog
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Successfully assigned '${quiz.title}'")),
+        );
+      }
+    } catch (e) {
+      debugPrint("Error posting quiz: $e");
     }
   }
 
@@ -53,33 +67,36 @@ class _TeacherQuizViewState extends State<TeacherQuizView> {
                   .collection('activeQuizzes')
                   .snapshots(),
               builder: (context, snapshot) {
+                if (snapshot.hasError) return const Center(child: Text("Error loading quizzes"));
                 if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
+                
                 final docs = snapshot.data!.docs;
-
-                if (docs.isEmpty) return const Center(child: Text("No active quizzes. Use the + button to assign one."));
+                if (docs.isEmpty) {
+                  return const Center(
+                    child: Text("No active quizzes. Use the + button to assign one."),
+                  );
+                }
 
                 return ListView.builder(
                   itemCount: docs.length,
                   itemBuilder: (context, index) {
                     final quizDoc = docs[index];
                     final data = quizDoc.data() as Map<String, dynamic>;
-                    bool isRiddle = data['type'] == 'riddle';
+                    final List questionsList = data['questions'] ?? [];
 
                     return ListTile(
-                      leading: Icon(
-                        isRiddle ? Icons.help_outline : Icons.quiz, 
-                        color: Colors.green
+                      leading: const CircleAvatar(
+                        backgroundColor: Colors.green,
+                        child: Icon(Icons.menu_book, color: Colors.white, size: 20),
                       ),
                       title: Text(data['title'] ?? 'Untitled Quiz'),
-                      subtitle: const Text("Tap to Preview Quiz Content"),
+                      subtitle: Text("${questionsList.length} Questions • Tap to Preview"),
                       onTap: () {
-                        // FIX: Directly open the Play/View screen for the teacher
+                        // Pass the data to the Play View for teacher preview
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => QuizPlayView(
-                              quizData: data,
-                            ),
+                            builder: (context) => QuizPlayView(quizData: data),
                           ),
                         );
                       },
@@ -105,15 +122,28 @@ class _TeacherQuizViewState extends State<TeacherQuizView> {
                 if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
                 final results = snapshot.data!.docs;
 
+                if (results.isEmpty) return const Center(child: Text("No results submitted yet."));
+
                 return ListView.builder(
                   itemCount: results.length,
                   itemBuilder: (context, index) {
                     final res = results[index];
                     return ListTile(
+                      leading: const Icon(Icons.person_outline),
                       title: Text(res['studentEmail'] ?? "Unknown Student"),
                       subtitle: Text("Quiz: ${res['quizTitle']}"),
-                      trailing: Text("Score: ${res['score']}", 
-                        style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green)),
+                      trailing: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.green.shade50,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.green),
+                        ),
+                        child: Text(
+                          "Score: ${res['score']}", 
+                          style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green),
+                        ),
+                      ),
                     );
                   },
                 );
@@ -133,9 +163,17 @@ class _TeacherQuizViewState extends State<TeacherQuizView> {
   Widget _buildSectionHeader(String title) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
       color: Colors.grey.shade100,
-      child: Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+      child: Text(
+        title.toUpperCase(), 
+        style: TextStyle(
+          fontSize: 12, 
+          fontWeight: FontWeight.bold, 
+          color: Colors.grey.shade700,
+          letterSpacing: 1.1,
+        ),
+      ),
     );
   }
 
@@ -146,24 +184,26 @@ class _TeacherQuizViewState extends State<TeacherQuizView> {
         title: const Text("Assign from Quiz Bank"),
         content: SizedBox(
           width: double.maxFinite,
-          child: ListView.builder(
+          child: ListView.separated(
             shrinkWrap: true,
-            itemCount: quizBank.length, //
+            itemCount: quizBank.length,
+            separatorBuilder: (context, index) => const Divider(),
             itemBuilder: (context, index) {
               final quiz = quizBank[index];
-              return Card(
-                child: ListTile(
-                  title: Text(quiz.title),
-                  subtitle: Text(quiz.type == 'riddle' ? "Riddle" : "Multiple Choice"),
-                  trailing: const Icon(Icons.send, color: Colors.green),
-                  onTap: () => _postFromBank(quiz),
-                ),
+              return ListTile(
+                title: Text(quiz.title, style: const TextStyle(fontWeight: FontWeight.w500)),
+                subtitle: Text("${quiz.questions.length} Items"),
+                trailing: const Icon(Icons.send, color: Colors.green, size: 20),
+                onTap: () => _postFromBank(quiz),
               );
             },
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
+          TextButton(
+            onPressed: () => Navigator.pop(context), 
+            child: const Text("Cancel"),
+          ),
         ],
       ),
     );

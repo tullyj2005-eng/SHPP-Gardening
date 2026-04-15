@@ -1,13 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'main.dart'; 
-import 'dart:math'; // Required for generating random codes
+import 'dart:math';
 
 class AccountLogic {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
-  // --- 1. AUTHENTICATION ---
+  // --- 1. AUTHENTICATION & PROFILE CREATION ---
+
   Future<String?> loginUser(String email, String password) async {
     UserCredential result = await _auth.signInWithEmailAndPassword(
         email: email, password: password);
@@ -18,21 +19,53 @@ class AccountLogic {
   Future<String?> registerUser(String email, String password, String role) async {
     UserCredential result = await _auth.createUserWithEmailAndPassword(
         email: email, password: password);
+    
+    // Initializing the user document with ALL necessary fields to prevent "null" errors
     await _db.collection('users').doc(result.user!.uid).set({
       'email': email,
       'role': role,
       'classCode': '', 
       'myClassCode': '', 
+      'totalXP': 0, // Ensures the XP bar doesn't crash on first load
     });
     return role;
   }
 
-  // --- 2. GARDEN DATA ---
+  // --- 2. GAMIFICATION (XP & LEVELS) ---
+
+  // Adds XP and returns the new total
+  Future<void> addExperience(int amount) async {
+    final user = _auth.currentUser;
+    if (user == null) return;
+
+    await _db.collection('users').doc(user.uid).update({
+      'totalXP': FieldValue.increment(amount),
+    });
+  }
+
+  // A stream that the Homepage uses to update the XP Bar in real-time
+  Stream<int> getUserXP() {
+    final user = _auth.currentUser;
+    if (user == null) return Stream.value(0);
+
+    return _db.collection('users').doc(user.uid).snapshots().map((doc) {
+      if (!doc.exists) return 0;
+      final data = doc.data() as Map<String, dynamic>;
+      return data['totalXP'] ?? 0;
+    });
+  }
+
+  // --- 3. GARDEN DATA ---
+
   Stream<List<TrackedPlant>> getMyGarden() {
     final user = _auth.currentUser;
     if (user == null) return Stream.value([]);
     
-    return _db.collection('users').doc(user.uid).collection('myGarden').snapshots().map((snapshot) {
+    return _db.collection('users')
+        .doc(user.uid)
+        .collection('myGarden')
+        .snapshots()
+        .map((snapshot) {
       return snapshot.docs.map((doc) {
         return TrackedPlant(
           name: doc['name'] ?? 'Unknown Plant',
@@ -43,30 +76,24 @@ class AccountLogic {
     });
   }
 
-  // NEW: Removes a specific plant from the user's garden
+  // Removes a specific plant document from the sub-collection
   Future<void> removePlantFromGarden(String plantName) async {
     final user = _auth.currentUser;
     if (user == null) return;
 
-    try {
-      // Find the document with the matching plant name and delete it
-      var snapshot = await _db.collection('users')
-          .doc(user.uid)
-          .collection('myGarden')
-          .where('name', isEqualTo: plantName)
-          .get();
+    final snapshot = await _db.collection('users')
+        .doc(user.uid)
+        .collection('myGarden')
+        .where('name', isEqualTo: plantName)
+        .get();
 
-      for (var doc in snapshot.docs) {
-        await doc.reference.delete();
-      }
-    } catch (e) {
-      print("Error removing plant: $e");
+    for (var doc in snapshot.docs) {
+      await doc.reference.delete();
     }
   }
 
-  // --- 3. THE MISSING CLASSROOM METHODS ---
+  // --- 4. CLASSROOM & QUIZ LOGIC ---
 
-  // TEACHER: Create a new class and save the code
   Future<String> createClass() async {
     final user = _auth.currentUser;
     if (user == null) throw Exception("Not logged in");
@@ -86,7 +113,6 @@ class AccountLogic {
     return newCode;
   }
 
-  // STUDENT: Join a class using a code
   Future<bool> joinClass(String code) async {
     final user = _auth.currentUser;
     if (user == null) return false;
@@ -101,12 +127,34 @@ class AccountLogic {
     return true;
   }
 
-  // --- 4. QUIZ LOGIC ---
   Future<void> postQuizToClass(String classCode, Map<String, dynamic> quizData) async {
     await _db.collection('classes').doc(classCode).collection('activeQuizzes').add({
       ...quizData,
       'postedAt': FieldValue.serverTimestamp(),
     });
+  }
+
+  // NEW: Optimized method for students to submit and get rewarded
+  Future<void> submitQuizAndReward({
+    required String classCode,
+    required String quizTitle,
+    required int score,
+    required int totalQuestions,
+  }) async {
+    final user = _auth.currentUser;
+    if (user == null) return;
+
+    // 1. Record the score for the teacher
+    await _db.collection('classes').doc(classCode).collection('results').add({
+      'studentEmail': user.email,
+      'quizTitle': quizTitle,
+      'score': score,
+      'totalQuestions': totalQuestions,
+      'timestamp': FieldValue.serverTimestamp(),
+    });
+
+    // 2. Award XP (10 points per correct answer)
+    await addExperience(score * 10);
   }
 
   Stream<QuerySnapshot> getStudentResults(String classCode) {
