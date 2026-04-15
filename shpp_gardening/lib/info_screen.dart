@@ -90,8 +90,11 @@ class _InfoScreenState extends State<InfoScreen> {
                       ),
                     ),
                     _buildResponsiveGrid(constraints.maxWidth, [
-                      mint(context, () => widget.onTrack('Mojito Mint')),
-                      rosemary(context, () => widget.onTrack('Rosemary')),
+                      mint(context, () => widget.onTrack('Μέντα')),
+                      rosemary(context, () => widget.onTrack('Δεντρολίβανο')),
+                      dittany(context, () => widget.onTrack('Δίκταμο')),
+                      thyme(context, () => widget.onTrack('Θυμάρι')),
+                      oregano(context, () => widget.onTrack('Ρίγανη')),
                     ]),
                   ],
                 );

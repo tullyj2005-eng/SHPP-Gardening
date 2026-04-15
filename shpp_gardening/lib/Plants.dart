@@ -15,6 +15,8 @@ class TrackedPlants {
 
 // --- PLANT WIDGETS ---
 
+// --plant widgets are in greek-- 
+
 
 // mint
 Widget mint(BuildContext context, VoidCallback onTrack) {
@@ -101,6 +103,131 @@ Widget rosemary(BuildContext context, VoidCallback onTrack) {
   );
 }
 
+
+
+// --DITTANY--
+Widget dittany(BuildContext context, VoidCallback onTrack) {
+  const String plantName = "Δίκταμο";
+  
+  const List<String> descriptionText = [
+    "Το δίκταμο (Origanum dictamnus), γνωστό και ως <<δίκταμο της Κρήτης>> , είναι ένας μικρός αρωματικός θάμνος με στρογγυλά φύλλα και όμορφα και όμορφα ροζ/μωβ άνθη το καλοκαίρι. Αγαπά τις ηλιόλουστες τοποθεσίες και χρειάζεται λίγο πότισμα. Αντέχει τις χαμηλές θερμοκρασίες του χειμώνα, γεγονός που το καθιστά ιδανικό, τόσο για την καλλιέργεια στον αγρό, όσο και για χρήση στο μπαλκόνι. Μπορεί να χρησιμοποιηθεί στο φαγητό, σε σαλάτες και ψητά αντί για ρίγανη (και τα άνθη και τα φυτά). Συνιστά, επίσης, ως αφέψημα για τις καταπραϋντικές του ιδιότητες. "
+  ]; 
+
+  const String howToText = 
+  "Χρειάζεται άφθονο ηλιακό φως και σχετικά υψηλές θερμοκρασίες. Χρειάζεται πότισμα κάθε 10 με 15 ημέρες εάν δεν βρέχει τον χειμώνα και πιο τακτικά το καλοκαίρι. Απαιτεί υψόμετρο μεγαλύτερο των 300 μέτρων. Είναι ανθεκτικό σε χαμηλές θερμοκρασίες. Τα κύρια προβλήματα μπορεί να προκύψουν από το υπερβολικό πότισμα αν και υπάρχει κίνδυνος προσβολής από βοτρύτη. ";
+  return InkWell(
+    onTap: () {
+      showPlantDetails(
+        context, 
+        ' Δίκταμο', 
+        descriptionText.join('\n\n'), 
+        howToText, 
+        onTrack // Pass it here
+      );
+    },
+    child: Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Image.asset('assets/Leaf (1).png', width: 150, height: 150, fit: BoxFit.contain),
+          ),
+          const Text(
+            plantName,
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 10),
+        ],
+      ),
+    ),
+  );
+}
+
+// --THYME--
+Widget thyme(BuildContext context, VoidCallback onTrack) {
+  const String plantName = "Θυμάρι";
+  
+  const List<String> descriptionText = [
+    "Το θυμάρι  (Thymus Vulgaris) είναι ένα πολυετές φυτό με χαμηλές απαιτήσεις σε νερό και υψηλές απαιτήσεις σε ηλιακό φως. Ευδοκιμεί σε φτωχά εδάφη, με αποτέλεσμα να προτιμάται στην καλλιέργεια. Η υψηλή του ανθεκτικότητα το καθιστά ιδανικό φυτό γλάστρας για αρχάριους, ενώ ενδεικνυται γενικότερα για φύτευση σε φυτοδοχεία. Χρησιμοποιείται ευρέως στη μαγειρική, ιδιαίτερα στα ψητά και στις μαρινάδες. Αποτελεί, επίσης, σημαντικό μελισσοκομικό φυτό, καθώς χρησιμοποιείται για την παραγωγή αρωματικού μελιού. Το αιθέριο έλαιό του είναι κοιν΄συστατικό στην αρωματοποιία και την κοσμετολογία. Τα φύλλα του έχουν ταξινομηθεί ως παραδοσιακό φυτικό φαρμακευτικό προϊόν για την αντιμετώπιση του βήχα."
+  ]; 
+
+  const String howToText = 
+  "Απαιτεί πλήρη έκθεση στον ήλιο και καλή αποστράγγιση.  Είναι ανθεκτικό στην ξηρασία, με χαμηλές ανάγκες σε νερό. Ευδοκιμεί ικανοποιητικά σε φτωχά εδάφη. ";
+  return InkWell(
+    onTap: () {
+      showPlantDetails(
+        context, 
+        'Θυμάρι ', 
+        descriptionText.join('\n\n'), 
+        howToText, 
+        onTrack // Pass it here
+      );
+    },
+    child: Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Image.asset('assets/Leaf (1).png', width: 150, height: 150, fit: BoxFit.contain),
+          ),
+          const Text(
+            plantName,
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 10),
+        ],
+      ),
+    ),
+  );
+}
+
+
+// --OREGANO--
+Widget oregano(BuildContext context, VoidCallback onTrack) {
+  const String plantName = "Ρίγανη";
+  
+  const List<String> descriptionText = [
+    "Η νησιωτική ρίγανη (Origanum onites) είναι ένα ιδιαίτερο είδος ρίγανης με δυνατό και γλυκό άρωμα. Είναι ένα ξηροφυτικό είδος, που δεν χρειάζεται πολύ νερό και ευδοκιμεί με τον ήλιο. Καταλληλη για φύτευση σε γλάστρα στο μπαλκόνι, καθώς είναι το ιδανικό αρωματικό φυτό για αρχάριους στην καλλιέργεια! Τα άνθη και τα φύλλα προσθέτουν γεύση σε όλα τα φαγητά, αλλά μπορεί και σε μικρές ποσότητες να χρησιμοποιηθεί σε ροφήματα."
+  ]; 
+
+  const String howToText = 
+  "Ξηροφυτικό είδος χωρίς ιδιαίτερες ανάγκες σε νερό. Απαιτεί μερική ή πλήρη έκθεση στο φως του ήλιου. Δεν υπάρχουν ιδιαίτερες απαιτήσεις ως προς το έδαφος, αρκεί να υπάρχει καλή αποστράγγιση για την απομάκρυνση του νερού. Είναι ανθεκτικό σε φτωχά και πετρώδη περιβάλλοντα.";
+  return InkWell(
+    onTap: () {
+      showPlantDetails(
+        context, 
+        'Ρίγανη', 
+        descriptionText.join('\n\n'), 
+        howToText, 
+        onTrack // Pass it here
+      );
+    },
+    child: Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Image.asset('assets/Leaf (1).png', width: 150, height: 150, fit: BoxFit.contain),
+          ),
+          const Text(
+            plantName,
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 10),
+        ],
+      ),
+    ),
+  );
+}
 
 
 
