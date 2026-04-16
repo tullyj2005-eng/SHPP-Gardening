@@ -8,6 +8,7 @@ import 'student_quiz_view.dart';
 import 'account_logic.dart';
 import 'plant_detail_view.dart'; 
 import 'settings_page_view.dart';
+import 'settings_logic.dart'; 
 
 class HomeScreen extends StatefulWidget {
   final List<TrackedPlant> tracked;
@@ -21,6 +22,13 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final AccountLogic _account = AccountLogic();
+  final TextEditingController _codeController = TextEditingController();
+
+  @override
+  void dispose() {
+    _codeController.dispose();
+    super.dispose();
+  }
 
   void _confirmDelete(BuildContext context, TrackedPlant plant) {
     showDialog(
@@ -56,9 +64,19 @@ class _HomeScreenState extends State<HomeScreen> {
 
     if (!userDoc.exists) return;
 
-    String code = widget.userRole == 'Teacher' 
-        ? userDoc.get('myClassCode') ?? "" 
-        : userDoc.get('classCode') ?? "";
+    String? code = widget.userRole == 'Teacher' 
+        ? userDoc.get('myClassCode') 
+        : userDoc.get('classCode');
+
+    if (code == null || code.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please join a classroom first to access quizzes!"),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
 
     if (mounted) {
       Navigator.push(
@@ -82,9 +100,12 @@ class _HomeScreenState extends State<HomeScreen> {
           // --- LEFT SIDEBAR PANEL ---
           Container(
             width: 210,
-            color: Theme.of(context).brightness == Brightness.light 
-                ? const Color(0xFFE8F5E9) 
-                : Colors.grey[900], 
+            // UPDATED: Logic to handle Deep Red Sidebar
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.grey[900]
+                : (ThemeManager.isRedMode 
+                    ? const Color.fromARGB(255, 120, 10, 0) // Deep Red
+                    : const Color(0xFFE8F5E9)),           // Standard Green/Tan
             child: Column(
               children: [
                 InkWell(
@@ -95,14 +116,24 @@ class _HomeScreenState extends State<HomeScreen> {
                   },
                   child: Container(
                     padding: const EdgeInsets.fromLTRB(16, 40, 16, 20),
-                    color: const Color(0xFF2E7D32), 
+                    // UPDATED: Logic to handle Header Color
+                    color: ThemeManager.isRedMode 
+                        ? const Color.fromARGB(255, 161, 16, 3) // Brighter Red
+                        : const Color(0xFF2E7D32),             // Original Green
                     width: double.infinity,
                     child: Column(
                       children: [
-                        const CircleAvatar(
+                        CircleAvatar(
                           radius: 30,
                           backgroundColor: Colors.white,
-                          child: Icon(Icons.person, size: 40, color: Color(0xFF2E7D32)),
+                          child: Icon(
+                            Icons.person, 
+                            size: 40, 
+                            // UPDATED: Icon color matches theme
+                            color: ThemeManager.isRedMode 
+                                ? const Color.fromARGB(255, 161, 16, 3) 
+                                : const Color(0xFF2E7D32),
+                          ),
                         ),
                         const SizedBox(height: 10),
                         Text(
@@ -116,7 +147,6 @@ class _HomeScreenState extends State<HomeScreen> {
                             overflow: TextOverflow.ellipsis,
                           ),
                           const SizedBox(height: 15),
-                          // --- MINI XP BAR IN SIDEBAR ---
                           StreamBuilder<int>(
                             stream: _account.getUserXP(),
                             builder: (context, snapshot) {
@@ -149,12 +179,23 @@ class _HomeScreenState extends State<HomeScreen> {
                 if (user != null) ...[
                   ListTile(
                     leading: const Icon(Icons.quiz_outlined, color: Colors.orange),
-                    title: const Text("Garden Quiz", style: TextStyle(fontSize: 14)),
+                    // UPDATED: Text color for readability on dark red
+                    title: Text("Garden Quiz", 
+                      style: TextStyle(
+                        fontSize: 14, 
+                        color: ThemeManager.isRedMode ? Colors.white : null
+                      )
+                    ),
                     onTap: () => _openQuiz(context),
                   ),
                   ListTile(
                     leading: const Icon(Icons.settings, color: Colors.blueGrey),
-                    title: const Text("Settings", style: TextStyle(fontSize: 14)),
+                    title: Text("Settings", 
+                      style: TextStyle(
+                        fontSize: 14, 
+                        color: ThemeManager.isRedMode ? Colors.white : null
+                      )
+                    ),
                     onTap: () {
                       Navigator.push(
                         context,
@@ -164,11 +205,15 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   ListTile(
                     leading: const Icon(Icons.logout, color: Colors.redAccent),
-                    title: const Text("Logout", style: TextStyle(fontSize: 14)),
+                    title: Text("Logout", 
+                      style: TextStyle(
+                        fontSize: 14, 
+                        color: ThemeManager.isRedMode ? Colors.white : null
+                      )
+                    ),
                     onTap: () => FirebaseAuth.instance.signOut(),
                   ),
                 ],
-
                 const Spacer(),
                 const Padding(
                   padding: EdgeInsets.all(16.0),
@@ -190,7 +235,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       const Text("My Garden", 
                         style: TextStyle(fontSize: 22, fontWeight: FontWeight.w400)),
-                      // --- LEVEL BADGE NEXT TO TITLE ---
                       if (user != null)
                         StreamBuilder<int>(
                           stream: _account.getUserXP(),
@@ -259,31 +303,80 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildClassroomSlot(BuildContext context) {
+    bool isTeacher = widget.userRole == 'Teacher';
+    final user = FirebaseAuth.instance.currentUser;
+
     return Center(
       child: Container(
-        width: 300,
+        width: 350,
         margin: const EdgeInsets.symmetric(vertical: 20),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Theme.of(context).brightness == Brightness.light 
               ? const Color(0xFFC8E6C9) 
-              : Colors.green.withOpacity(0.2), 
+              : Colors.green.withOpacity(0.1), 
           borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.green.withOpacity(0.3)),
         ),
         child: Column(
           children: [
-            const Text("Class Management", style: TextStyle(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 10),
-            ElevatedButton.icon(
-              onPressed: () {}, 
-              icon: const Icon(Icons.vpn_key_outlined, size: 18),
-              label: const Text("Generate New Class Code"),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF2E7D32),
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-              ),
+            Text(
+              isTeacher ? "Teacher Dashboard" : "Join a Classroom", 
+              style: const TextStyle(fontWeight: FontWeight.bold)
             ),
+            const SizedBox(height: 12),
+            if (isTeacher)
+              ElevatedButton.icon(
+                onPressed: () {}, 
+                icon: const Icon(Icons.vpn_key_outlined, size: 18),
+                label: const Text("Generate New Class Code"),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF2E7D32),
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                ),
+              )
+            else
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _codeController,
+                      decoration: InputDecoration(
+                        hintText: "Enter Code",
+                        isDense: true,
+                        filled: true,
+                        fillColor: Theme.of(context).cardColor,
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  ElevatedButton(
+                    onPressed: () async {
+                      if (_codeController.text.isNotEmpty && user != null) {
+                        await FirebaseFirestore.instance
+                            .collection('users')
+                            .doc(user.uid)
+                            .update({'classCode': _codeController.text.trim()});
+                        
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text("Classroom joined successfully!")),
+                          );
+                          _codeController.clear();
+                        }
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF2E7D32),
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    child: const Text("Submit"),
+                  ),
+                ],
+              ),
           ],
         ),
       ),

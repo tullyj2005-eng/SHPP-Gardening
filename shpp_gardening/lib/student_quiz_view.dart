@@ -1,80 +1,116 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'quiz_play_view.dart'; // Ensure this file exists and handles the quizData
+import 'package:firebase_auth/firebase_auth.dart';
+import 'quiz_play_view.dart'; 
 
 class StudentQuizView extends StatelessWidget {
   final String classCode;
-  final List<String> completedTitles; // List of titles the student already finished
 
   const StudentQuizView({
     super.key, 
-    required this.classCode, 
-    this.completedTitles = const []
+    required this.classCode,
   });
 
   @override
   Widget build(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Available Quizzes"),
         backgroundColor: Colors.green,
         foregroundColor: Colors.white,
       ),
-      body: StreamBuilder<QuerySnapshot>(
+      body: StreamBuilder<DocumentSnapshot>(
         stream: FirebaseFirestore.instance
-            .collection('classes')
-            .doc(classCode)
-            .collection('activeQuizzes')
+            .collection('users')
+            .doc(user?.uid)
             .snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) return Center(child: Text("Error: ${snapshot.error}"));
-          if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
+        builder: (context, userSnapshot) {
+          if (userSnapshot.hasError) return Center(child: Text("Error: ${userSnapshot.error}"));
+          if (!userSnapshot.hasData) return const Center(child: CircularProgressIndicator());
 
-          // FILTER LOGIC: Only show quizzes NOT in the completed list
-          // Note: For Teachers, completedTitles is passed as [] so nothing is filtered out
-          final availableQuizzes = snapshot.data!.docs.where((doc) {
-            return !completedTitles.contains(doc.get('title'));
-          }).toList();
+          // FIX: Use .data() and the null-aware operator to check if field exists
+          final userData = userSnapshot.data?.data() as Map<String, dynamic>?;
+          List<dynamic> completedTitles = userData != null && userData.containsKey('completedQuizzes')
+              ? userData['completedQuizzes']
+              : [];
 
-          if (availableQuizzes.isEmpty) {
-            return const Center(
-              child: Padding(
-                padding: EdgeInsets.all(20.0),
-                child: Text(
-                  "No quizzes available at the moment!",
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            );
-          }
+          return StreamBuilder<QuerySnapshot>(
+            stream: FirebaseFirestore.instance
+                .collection('classes')
+                .doc(classCode)
+                .collection('activeQuizzes')
+                .snapshots(),
+            builder: (context, snapshot) {
+              if (snapshot.hasError) return Center(child: Text("Error: ${snapshot.error}"));
+              if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
 
-          return ListView.builder(
-            itemCount: availableQuizzes.length,
-            itemBuilder: (context, index) {
-              final doc = availableQuizzes[index];
-              final data = doc.data() as Map<String, dynamic>;
-              bool isRiddle = data['type'] == 'riddle';
+              final availableQuizzes = snapshot.data!.docs.where((doc) {
+                String quizTitle = doc.get('title') ?? "";
+                return !completedTitles.contains(quizTitle);
+              }).toList();
 
-              return ListTile(
-                leading: Icon(
-                  isRiddle ? Icons.help_outline : Icons.quiz, 
-                  color: Colors.green
-                ),
-                title: Text(data['title'] ?? 'Untitled Quiz'),
-                subtitle: Text(isRiddle ? "Type: Riddle" : "Type: Multiple Choice"),
-                trailing: const Icon(Icons.play_arrow, color: Colors.green),
-                onTap: () {
-                  // CORRECTED: Navigates to the play view with the document data
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => QuizPlayView(
-                        quizData: {
-                          'title': data['title'],
-                          'type': data['type'],
-                          'questions': data['questions'],
-                        },
+              // UI UPDATE: Show central text when all quizzes are finished
+              if (availableQuizzes.isEmpty) {
+                return const Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.check_circle_outline, color: Colors.green, size: 80),
+                      SizedBox(height: 16),
+                      Text(
+                        "ALL QUIZZES COMPLETE!",
+                        style: TextStyle(
+                          fontSize: 20, 
+                          fontWeight: FontWeight.bold,
+                          color: Colors.green,
+                          letterSpacing: 1.2,
+                        ),
                       ),
+                      SizedBox(height: 8),
+                      Text("Check back later for new challenges.", style: TextStyle(color: Colors.grey)),
+                    ],
+                  ),
+                );
+              }
+
+              return ListView.builder(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                itemCount: availableQuizzes.length,
+                itemBuilder: (context, index) {
+                  final doc = availableQuizzes[index];
+                  final data = doc.data() as Map<String, dynamic>;
+                  bool isRiddle = data['type'] == 'riddle';
+
+                  return Card(
+                    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        backgroundColor: Colors.green.withOpacity(0.1),
+                        child: Icon(
+                          isRiddle ? Icons.help_outline : Icons.quiz, 
+                          color: Colors.green
+                        ),
+                      ),
+                      title: Text(data['title'] ?? 'Untitled Quiz', style: const TextStyle(fontWeight: FontWeight.bold)),
+                      subtitle: Text(isRiddle ? "Riddle Challenge" : "Multiple Choice"),
+                      trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => QuizPlayView(
+                              quizData: {
+                                'id': doc.id,
+                                'title': data['title'],
+                                'type': data['type'],
+                                'questions': data['questions'],
+                              },
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   );
                 },

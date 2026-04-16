@@ -1,5 +1,6 @@
 import 'plants.dart'; 
 import 'package:flutter/material.dart';
+import 'settings_logic.dart'; // Ensure this is imported for ThemeManager access
 
 // --- INFO SCREEN ---
 class InfoScreen extends StatefulWidget {
@@ -32,8 +33,12 @@ class _InfoScreenState extends State<InfoScreen> {
           // --- CATEGORY SIDEBAR ---
           Container(
             width: 200,
-            // Theme-aware color logic
-            color: isDark ? const Color(0xFF1A1C1E) : Colors.green.shade50,
+            // UPDATED: Logic for Deep Red Sidebar
+            color: isDark 
+                ? const Color(0xFF1A1C1E) 
+                : (ThemeManager.isRedMode 
+                    ? const Color.fromARGB(255, 120, 10, 0) // Deep Red
+                    : Colors.green.shade50),                 // Standard Light Green
             child: ListView(
               children: [
                 DrawerHeader(
@@ -42,15 +47,25 @@ class _InfoScreenState extends State<InfoScreen> {
                     style: TextStyle(
                       fontSize: 20, 
                       fontWeight: FontWeight.bold,
-                      color: isDark ? Colors.white : Colors.black87,
+                      // UPDATED: Text color for readability
+                      color: (isDark || ThemeManager.isRedMode) ? Colors.white : Colors.black87,
                     )
                   )
                 ),
                 ListTile(
-                  leading: Icon(Icons.spa, color: isDark ? Colors.greenAccent : Colors.green),
+                  leading: Icon(
+                    Icons.spa, 
+                    // UPDATED: Icon color
+                    color: ThemeManager.isRedMode 
+                        ? Colors.white70 
+                        : (isDark ? Colors.greenAccent : Colors.green),
+                  ),
                   title: Text(
                     'Aromatics',
-                    style: TextStyle(color: isDark ? Colors.white70 : Colors.black87),
+                    style: TextStyle(
+                      // UPDATED: Title text color
+                      color: (isDark || ThemeManager.isRedMode) ? Colors.white70 : Colors.black87
+                    ),
                   ),
                   onTap: _scrollToAromatics,
                 ),
@@ -76,15 +91,20 @@ class _InfoScreenState extends State<InfoScreen> {
                             style: TextStyle(
                               fontSize: 26, 
                               fontWeight: FontWeight.bold, 
-                              // Use light green in Dark Mode, dark green in Light Mode
-                              color: isDark ? Colors.greenAccent : Colors.green.shade900
+                              // UPDATED: Title color to match Red Theme
+                              color: ThemeManager.isRedMode
+                                  ? const Color.fromARGB(255, 161, 16, 3) // Deep Red Title
+                                  : (isDark ? Colors.greenAccent : Colors.green.shade900),
                             )
                           ),
                           const SizedBox(height: 4),
                           Container(
                             height: 2, 
                             width: 100, 
-                            color: isDark ? Colors.greenAccent.withOpacity(0.5) : Colors.green.shade300
+                            // UPDATED: Underline color
+                            color: ThemeManager.isRedMode
+                                ? const Color.fromARGB(255, 161, 16, 3).withOpacity(0.5)
+                                : (isDark ? Colors.greenAccent.withOpacity(0.5) : Colors.green.shade300),
                           ),
                         ],
                       ),

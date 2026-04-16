@@ -8,8 +8,31 @@ import 'firebase_options.dart';
 import 'account_logic.dart';
 import 'info_screen.dart';
 import 'login_page.dart';
-import 'home_page.dart'; // Ensure this matches your sidebar file name
-import 'settings_logic.dart'; //
+import 'home_page.dart'; 
+import 'settings_logic.dart';
+
+// 1. Move Theme Definitions outside the widget tree to avoid syntax errors
+final ThemeData greenTheme = ThemeData(
+  primarySwatch: Colors.green,
+  useMaterial3: true,
+  brightness: Brightness.light,
+);
+
+final ThemeData darkTheme = ThemeData(
+  primarySwatch: Colors.green,
+  useMaterial3: true,
+  brightness: Brightness.dark,
+);
+
+final ThemeData redTheme = ThemeData(
+  useMaterial3: true,
+  brightness: Brightness.light,
+  colorScheme: ColorScheme.fromSeed(
+    seedColor: const Color.fromARGB(255, 235, 90, 80),
+    primary: const Color.fromARGB(255, 235, 90, 80),
+    secondary: const Color.fromARGB(255, 161, 16, 3),
+  ),
+);
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,29 +47,22 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // STEP 3: Listen to theme changes globally
+    // Listen to theme changes globally
     return ValueListenableBuilder<ThemeMode>(
-      valueListenable: ThemeManager.themeMode, //
+      valueListenable: ThemeManager.themeMode, 
       builder: (context, currentMode, child) {
+        
+        // Logic to decide between the standard green and the custom red theme
+        // You can link 'isRedSelected' to a ValueNotifier in SettingsLogic later
+        bool useRed = ThemeManager.isRedMode; 
+
         return MaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'SHPP Gardening',
           
-          // Light Theme configuration
-          theme: ThemeData(
-            primarySwatch: Colors.green,
-            useMaterial3: true,
-            brightness: Brightness.light,
-          ),
-          
-          // Dark Theme configuration
-          darkTheme: ThemeData(
-            primarySwatch: Colors.green,
-            useMaterial3: true,
-            brightness: Brightness.dark,
-          ),
-          
-          // This tells Flutter which theme to use based on the Settings toggle
+          // Selection logic for themes
+          theme: useRed ? redTheme : greenTheme,
+          darkTheme: darkTheme,
           themeMode: currentMode, 
           
           home: const AuthCheck(),
@@ -73,7 +89,11 @@ class AuthCheck extends StatelessWidget {
             future: FirebaseFirestore.instance.collection('users').doc(snapshot.data!.uid).get(),
             builder: (context, userDoc) {
               if (!userDoc.hasData) return const Scaffold(body: Center(child: CircularProgressIndicator()));
-              String role = userDoc.data!.get('role') ?? 'Student';
+              
+              // Handle case where user document or role might be missing
+              final data = userDoc.data?.data() as Map<String, dynamic>?;
+              String role = (data != null && data.containsKey('role')) ? data['role'] : 'Student';
+              
               return HomePage(userRole: role);
             },
           );
@@ -156,33 +176,21 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-
 // --- LEVEL CALCULATION ---
 class LevelCalculator {
-  // Define how much XP is needed for each level
   static const int xpPerLevel = 100;
 
-  /// Calculates the current level based on total XP.
-  /// Example: 0-99 XP = Level 1, 100-199 XP = Level 2.
   static int getLevel(int totalXP) {
     if (totalXP < 0) return 1;
     return (totalXP / xpPerLevel).floor() + 1;
   }
 
-  /// Calculates the progress (0.0 to 1.0) towards the NEXT level.
-  /// This is used directly by the LinearProgressIndicator 'value' property.
   static double getLevelProgress(int totalXP) {
     if (totalXP < 0) return 0.0;
-    
-    // Get the remainder of XP after accounting for completed levels
     int xpInCurrentLevel = totalXP % xpPerLevel;
-    
-    // Return as a decimal (e.g., 45 XP / 100 = 0.45)
     return xpInCurrentLevel / xpPerLevel;
   }
 
-  /// Optional: Calculates how much XP is left until the next level.
-  /// Useful if you want to show a "50 XP until Level 3" label.
   static int xpUntilNextLevel(int totalXP) {
     int xpInCurrentLevel = totalXP % xpPerLevel;
     return xpPerLevel - xpInCurrentLevel;

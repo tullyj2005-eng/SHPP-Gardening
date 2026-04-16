@@ -174,7 +174,7 @@ Widget thyme(BuildContext context, VoidCallback onTrack) {
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Image.asset('assets/Leaf (1).png', width: 150, height: 150, fit: BoxFit.contain),
+            child: Image.asset('assets/Thyme.png', width: 150, height: 150, fit: BoxFit.contain),
           ),
           const Text(
             plantName,

@@ -16,13 +16,15 @@ class PlantDetailView extends StatelessWidget {
       'problems': 'Downy mildew (yellowing leaves) and Fusarium wilt.'
     },
     // Add more plants as needed
+
+    /// Ignore the above text this was an old snippet, the below is the new one 
   };
 
   @override
   Widget build(BuildContext context) {
     // Default data if the plant isn't in our map
     final info = plantCareData[plantName] ?? {
-      'care': 'General care: Ensure proper sunlight and consistent watering schedules.',
+      'care': 'General care: Ensure proper sunlight and consistent watering schedules.',   //Have Katerina Translate this here 
       'problems': 'Watch for common pests like spider mites or signs of nutrient deficiency.'
     };
 

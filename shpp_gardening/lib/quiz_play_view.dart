@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; // Added this import
+import 'package:firebase_auth/firebase_auth.dart';    // Added this import
 import 'account_logic.dart';
 
 class QuizPlayView extends StatefulWidget {
@@ -12,12 +14,11 @@ class QuizPlayView extends StatefulWidget {
 
 class _QuizPlayViewState extends State<QuizPlayView> {
   int _currentIndex = 0;
-  int _score = 0; // Tracks correct answers
+  int _score = 0; 
   final TextEditingController _answerController = TextEditingController();
   final AccountLogic _account = AccountLogic();
 
   void _nextQuestion(int total, Map<String, dynamic> currentQ, {String? selectedAnswer}) {
-    // 1. Check Answer
     String correct = currentQ['correctAnswer'] ?? "";
     String userResponse = selectedAnswer ?? _answerController.text.trim();
 
@@ -25,7 +26,6 @@ class _QuizPlayViewState extends State<QuizPlayView> {
       _score++;
     }
 
-    // 2. Navigation Logic
     if (_currentIndex < total - 1) {
       setState(() {
         _currentIndex++;
@@ -37,7 +37,6 @@ class _QuizPlayViewState extends State<QuizPlayView> {
   }
 
   void _showResults(int total) async {
-    // Award 10 XP per correct answer
     int xpGained = _score * 10;
     await _account.addExperience(xpGained);
 
@@ -59,9 +58,36 @@ class _QuizPlayViewState extends State<QuizPlayView> {
         ),
         actions: [
           TextButton(
-            onPressed: () {
-              Navigator.pop(context); // Close dialog
-              Navigator.pop(context); // Return to Garden Home
+            onPressed: () async {
+              // --- ADDED COMPLETION LOGIC HERE ---
+              final user = FirebaseAuth.instance.currentUser;
+              final quizTitle = widget.quizData['title'];
+
+              if (user != null && quizTitle != null) {
+                try {
+                  await FirebaseFirestore.instance
+                      .collection('users')
+                      .doc(user.uid)
+                      .update({
+                    'completedQuizzes': FieldValue.arrayUnion([quizTitle])
+                  });
+                } catch (e) {
+                  print("Error marking quiz as complete: $e");
+                  // If the field doesn't exist, use set with merge
+                  await FirebaseFirestore.instance
+                      .collection('users')
+                      .doc(user.uid)
+                      .set({
+                    'completedQuizzes': [quizTitle]
+                  }, SetOptions(merge: true));
+                }
+              }
+              // -----------------------------------
+
+              if (mounted) {
+                Navigator.pop(context); // Close dialog
+                Navigator.pop(context); // Return to StudentQuizView
+              }
             },
             child: const Text("Finish"),
           ),
@@ -74,8 +100,6 @@ class _QuizPlayViewState extends State<QuizPlayView> {
   Widget build(BuildContext context) {
     final questions = widget.quizData['questions'] as List<dynamic>;
     final currentQ = questions[_currentIndex] as Map<String, dynamic>;
-    
-    // Check type of current question
     String type = currentQ['type'] ?? 'multiple_choice';
 
     return Scaffold(
@@ -89,7 +113,6 @@ class _QuizPlayViewState extends State<QuizPlayView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Progress Header
             LinearProgressIndicator(
               value: (_currentIndex + 1) / questions.length,
               backgroundColor: Colors.grey.shade200,
@@ -98,16 +121,10 @@ class _QuizPlayViewState extends State<QuizPlayView> {
             const SizedBox(height: 10),
             Text("Question ${_currentIndex + 1} of ${questions.length}", 
                  style: TextStyle(color: Colors.grey.shade600, fontWeight: FontWeight.w500)),
-            
             const SizedBox(height: 30),
-            
-            // Question Text
             Text(currentQ['questionText'] ?? "No Question text found", 
                  style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-            
             const SizedBox(height: 30),
-            
-            // Input Area
             if (type == 'riddle') ...[
               TextField(
                 controller: _answerController,
@@ -129,7 +146,6 @@ class _QuizPlayViewState extends State<QuizPlayView> {
                 ),
               )
             ] else ...[
-              // Multiple Choice Options
               ...(currentQ['options'] as List<dynamic>? ?? []).map((opt) => 
                 Padding(
                   padding: const EdgeInsets.only(bottom: 12),

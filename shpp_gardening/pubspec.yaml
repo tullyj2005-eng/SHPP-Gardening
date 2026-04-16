@@ -26,6 +26,9 @@ flutter:
   uses-material-design: true
   assets:
     - assets/
+    - assets/Thyme.png
+    - assets/Leaf (1).png
+
 
 
 

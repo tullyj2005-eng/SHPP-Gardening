@@ -33,6 +33,8 @@ final techQuestions = [
 
 ///////////////////////////////////////////////////////////////////////////////
 
+
+// --- OREGANO QUIZ ---
 final oreganoQuestions = [
   Question( 
     questionText: "I am a plant that loves to sunbathe all day. I smell very sweet and I am the perfect plant to start your garden",
@@ -57,6 +59,17 @@ final oreganoQuestions = [
     correctAnswer: "You can make seasoning",
     options: ["You can make seasoning", "You can make medicine", "You can make a scrambled eggs", "You can make a cake"],
   )
+];
+
+
+// --- MINT QUIZ ---
+final mintQuestions = [
+  Question(
+    questionText: "I am a plant that is known for its refreshing scent and is often used in teas. What am I?",
+    type: "riddle",
+    correctAnswer: "Mint",
+    options: ["Basil", "Oregano", "Mint", "Thyme"],
+  ),
 ];
 
 // 2. Put them into the Quiz Bank
