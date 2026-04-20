@@ -49,7 +49,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Login"), 
+        title: const Text("Σύνδεση"), 
         backgroundColor: Colors.green,
         foregroundColor: Colors.white,
       ),
@@ -65,7 +65,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
               TextField(
                 controller: _passwordController, 
-                decoration: const InputDecoration(labelText: "Password"), 
+                decoration: const InputDecoration(labelText: "Σύνθημα"), 
                 obscureText: true,
               ),
               const SizedBox(height: 24),
@@ -81,7 +81,7 @@ class _LoginPageState extends State<LoginPage> {
                             backgroundColor: Colors.green, 
                             foregroundColor: Colors.white
                           ),
-                          child: const Text("Login"),
+                          child: const Text("Σύνδεση"),
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -92,7 +92,7 @@ class _LoginPageState extends State<LoginPage> {
                             MaterialPageRoute(builder: (context) => const RegisterPage())
                           );
                         },
-                        child: const Text("Don't have an account? Register here"),
+                        child: const Text("Δεν έχετε λογαριασμό? Εγγραφείτε εδώ"),
                       ),
                     ],
                   ),

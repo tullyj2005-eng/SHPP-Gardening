@@ -63,10 +63,10 @@ Widget mint(BuildContext context, VoidCallback onTrack) {
 
 // ROSEMARY
 Widget rosemary(BuildContext context, VoidCallback onTrack) {
-  const String plantName = "Δεντρολίβανο";
+  const String plantName = "Δενδολίβανο";
   
   const List<String> descriptionText = [
-      " Το έρπον δεντρολίβανο (Rosmarinus officinalis prostratus) είναι ένα αειθαλές, πολυετές φυτό, το οποίο εξελίσσεται σε έναν μεγάλο , πυκνό θάμνο που απλώνει τα κλαδιά του πλευρικά. Είναι ένα από τα πιο ανθεκτικά αρωματικά φυτά, τόσο σε γλάστρα όσο και στο έδαφος. Την άνοιξη και το φθινόπωρο παράγει μικρά λαο λευκά άνθη. Προτιμά ηλιόλουστα, ξηρά περιβάλλοντα και, αν φυτευτεί στο έδαφος μπορεί να ποτίζεται αποκλειστικά από την βροχή. Καθ’ όλη την διάρκεια του έτους μπoρείτε να συλλέξετε τα φύλλα για την μαγειρική. Τα άνθη του πρoσeλκύουν τις μέλισσες και γi' αυτό χρησιμoπoιoύ νtαι ευρέως σtη ν μeλiσσoκoμίa.Έχeι πeρiγpafeί ωs πaρaδoσiakό φaρμaκeυtikό πpωϊόn γi' tη ν αントiμeтώπiση tης δyσpeψίaς, δyσmηnόppoiaς και tου πoноkefału."
+      " Το έρπον δενδρολίβανο (Rosmarinus officinalis prostratus) είναι ένα αειθαλές, πολυετές φυτό, το οποίο εξελίσσεται σε έναν μεγάλο , πυκνό θάμνο που απλώνει τα κλαδιά του πλευρικά. Είναι ένα από τα πιο ανθεκτικά αρωματικά φυτά, τόσο σε γλάστρα όσο και στο έδαφος. Την άνοιξη και το φθινόπωρο παράγει μικρά λαο λευκά άνθη. Προτιμά ηλιόλουστα, ξηρά περιβάλλοντα και, αν φυτευτεί στο έδαφος μπορεί να ποτίζεται αποκλειστικά από την βροχή. Καθ’ όλη την διάρκεια του έτους μπoρείτε να συλλέξετε τα φύλλα για την μαγειρική. Τα άνθη του πρoσeλκύουν τις μέλισσες και γi' αυτό χρησιμoπoιoύ νtαι ευρέως σtη ν μeλiσσoκoμίa.Έχeι πeρiγpafeί ωs πaρaδoσiakό φaρμaκeυtikό πpωϊόn γi' tη ν αントiμeтώπiση tης δyσpeψίaς, δyσmηnόppoiaς και tου πoноkefału."
       ]; // Joins the list into a single string with double line breaks
 
 
@@ -76,7 +76,7 @@ Widget rosemary(BuildContext context, VoidCallback onTrack) {
     onTap: () {
       showPlantDetails(
         context, 
-        'Δεντρολίβανο', 
+        'Δενδολίβανο', 
         descriptionText.join('\n\n'), 
         howToText, 
         onTrack // Pass it here
@@ -253,13 +253,13 @@ void showPlantDetails(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text('Description', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                const Text('Περιγραφή', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
                 const Divider(color: Colors.green),
                 Text(description),
                 
                 const SizedBox(height: 20),
 
-                const Text('How To Grow', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                const Text('Φροντίδα', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
                 const Divider(color: Colors.green),
                 Text(howTo),
               ],
@@ -283,13 +283,13 @@ void showPlantDetails(
                 SnackBar(content: Text('$name added to tracked plants!')),
               );
             },
-            child: const Text('Track Plant'),
+            child: const Text('Επιλογή φυτού'),
           ),
 
           // --- CLOSE BUTTON ---
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Close', style: TextStyle(color: Colors.grey)),
+            child: const Text('Κλείσιμο', style: TextStyle(color: Colors.grey)),
           ),
         ],
       );

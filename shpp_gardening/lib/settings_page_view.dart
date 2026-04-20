@@ -12,7 +12,7 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Settings")),
+      appBar: AppBar(title: const Text("Ρυθμίσεις")),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -24,7 +24,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 children: [
                   SwitchListTile(
                     secondary: Icon(mode == ThemeMode.dark ? Icons.dark_mode : Icons.light_mode),
-                    title: const Text("Dark Mode"),
+                    title: const Text("Σκούρα εμφάνιση"),
                     value: mode == ThemeMode.dark,
                     onChanged: (bool value) => ThemeManager.toggleTheme(value),
                   ),
@@ -34,8 +34,8 @@ class _SettingsPageState extends State<SettingsPage> {
                   if (mode != ThemeMode.dark)
                     SwitchListTile(
                       secondary: const Icon(Icons.palette, color: Colors.red),
-                      title: const Text("Red Floral Theme"),
-                      subtitle: const Text("Switch from green to red aesthetic"),
+                      title: const Text("Κόκκινη εμφάνιση"),
+                      subtitle: const Text("Αλλαγή από πράσινη σε κόκκινη εμφάνιση"),
                       value: ThemeManager.isRedMode,
                       onChanged: (bool value) {
                         setState(() {
@@ -53,14 +53,14 @@ class _SettingsPageState extends State<SettingsPage> {
           // --- HOW IT WORKS SECTION ---
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 16),
-            child: Text("How it Works", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            child: Text("Τρόπος λειτουργίας", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
           ),
-          _buildInfoStep(Icons.add_task, "Add Plants", "Use the 'Add' button to start tracking your real-life plants."),
-          _buildInfoStep(Icons.opacity, "Monitor Thirst", "The Thirst Meter shows you how badly your plant needs water based on your specific settings."),
-          _buildInfoStep(Icons.quiz, "Test Your Knowledge", "Teachers can post quizzes to class codes to help you learn better plant care."),
-          _buildInfoStep(Icons.touch_app, "Care Guides", "Tap any plant in your garden to view detailed instructions on how to grow it effectively."),
-          _buildInfoStep(Icons.info, "About", "To remove a plant from you garden, simply long press on it and confirm removal. This will not delete the plant from your library, so you can add it back anytime!"),
-        ],
+          _buildInfoStep(Icons.add_task, "Προσθήκη φυτού", "Χρησιμοποιήστε το κουμπί 'Προσθήκη φυτού' για να ξεκινήσετε την παρακολούθηση του φυτού σας."),
+          _buildInfoStep(Icons.opacity, "Μετρητής νερού", "Ο μετρητής νερού δείχνει πόσο νερό χρειάζεται το φυτό σας, βάσει των ρυθμίσεων σας."),
+          _buildInfoStep(Icons.quiz, "Τεστ γνώσεων", "Οι δάσκαλοι μπορούν να δημοσιεύσουν τεστ στους κωδικούς τάξης για να σας βοηθήσουν να μάθετε καλύτερα τη φροντίδα των φυτών."),
+          _buildInfoStep(Icons.touch_app, "Οδηγός φροντίδας", "Διαλέξτε οποιοδήποτε φυτό για να δείτε λεπτομερείς οδηγίες για την καλύτερη ανάπτυξή τους."),
+          _buildInfoStep(Icons.info, "Αφαίρεση", "To remove a plant from you garden, simply long press on it and confirm removal. This will not delete the plant from your library, so you can add it back anytime!"),
+        ]
       ),
     );
   }

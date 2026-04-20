@@ -34,19 +34,19 @@ class _HomeScreenState extends State<HomeScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("Remove Plant?"),
-        content: Text("Are you sure you want to stop tracking ${plant.name}?"),
+        title: const Text("Αφαίρεση φυτού?"),
+        content: Text("Είστε σίγουροι ότι θέλετε να σταματήσετε την αφαίρεση ${plant.name}?"),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text("Cancel"),
+            child: const Text("Ακύρωση"),
           ),
           TextButton(
             onPressed: () async {
               await _account.removePlantFromGarden(plant.name);
               if (mounted) Navigator.pop(context);
             },
-            child: const Text("Remove", style: TextStyle(color: Colors.red)),
+            child: const Text("Αφαίρεση", style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -71,7 +71,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if (code == null || code.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("Please join a classroom first to access quizzes!"),
+          content: Text("Παρακαλώ εγγραφείτε πρώτα σε μια τάξη για να έχετε πρόσβαση στα κουίζ!"),
           backgroundColor: Colors.orange,
         ),
       );
@@ -137,7 +137,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         const SizedBox(height: 10),
                         Text(
-                          user == null ? "Sign In" : "Active User",
+                          user == null ? "Σύνδεση" : "Χρήστης",
                           style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                         ),
                         if (user != null) ...[
@@ -164,7 +164,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     ),
                                   ),
                                   const SizedBox(height: 4),
-                                  Text("Growth Progress", style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 9)),
+                                  Text("Πρόοδος Ανάπτυξης", style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 9)),
                                 ],
                               );
                             },
@@ -180,7 +180,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ListTile(
                     leading: const Icon(Icons.quiz_outlined, color: Colors.orange),
                     // UPDATED: Text color for readability on dark red
-                    title: Text("Garden Quiz", 
+                    title: Text("Κουίζ Κήπου", 
                       style: TextStyle(
                         fontSize: 14, 
                         color: ThemeManager.isRedMode ? Colors.white : null
@@ -190,7 +190,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   ListTile(
                     leading: const Icon(Icons.settings, color: Colors.blueGrey),
-                    title: Text("Settings", 
+                    title: Text("Ρυθμίσεις", 
                       style: TextStyle(
                         fontSize: 14, 
                         color: ThemeManager.isRedMode ? Colors.white : null
@@ -205,7 +205,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   ListTile(
                     leading: const Icon(Icons.logout, color: Colors.redAccent),
-                    title: Text("Logout", 
+                    title: Text("Αποσύνδεση", 
                       style: TextStyle(
                         fontSize: 14, 
                         color: ThemeManager.isRedMode ? Colors.white : null
@@ -233,7 +233,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text("My Garden", 
+                      const Text("Ο Κήπος μου", 
                         style: TextStyle(fontSize: 22, fontWeight: FontWeight.w400)),
                       if (user != null)
                         StreamBuilder<int>(
@@ -247,7 +247,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 borderRadius: BorderRadius.circular(20),
                                 border: Border.all(color: Colors.orange),
                               ),
-                              child: Text("LVL $level", 
+                              child: Text("ΕΠΙΠΕΔΟ $level", 
                                 style: const TextStyle(color: Colors.orange, fontWeight: FontWeight.bold, fontSize: 12)),
                             );
                           },
@@ -261,7 +261,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                 Expanded(
                   child: widget.tracked.isEmpty
-                      ? const Center(child: Text("Add a plant to start tracking!"))
+                      ? const Center(child: Text("Προσθέστε ένα φυτό για να αρχίσετε την αυλή σας!"))
                       : ListView.builder(
                           padding: const EdgeInsets.symmetric(horizontal: 24),
                           itemCount: widget.tracked.length,
@@ -287,7 +287,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 },
                                 onLongPress: () => _confirmDelete(context, plant),
                                 title: Text(plant.name, style: const TextStyle(fontWeight: FontWeight.w600)),
-                                subtitle: Text("Thirst Meter: $thirstMeter%"),
+                                subtitle: Text("Μετρητής Ξηρασίας: $thirstMeter%"),
                                 trailing: const Icon(Icons.water_drop, color: Colors.blue),
                               ),
                             );
@@ -321,7 +321,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           children: [
             Text(
-              isTeacher ? "Teacher Dashboard" : "Join a Classroom", 
+              isTeacher ? "Πίνακας ελέγχου εκπαιδευτικού" : "Εγγραφή σε Τάξη", 
               style: const TextStyle(fontWeight: FontWeight.bold)
             ),
             const SizedBox(height: 12),
@@ -329,7 +329,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ElevatedButton.icon(
                 onPressed: () {}, 
                 icon: const Icon(Icons.vpn_key_outlined, size: 18),
-                label: const Text("Generate New Class Code"),
+                label: const Text("Δημιουργία νέου κώδικα τάξης"),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF2E7D32),
                   foregroundColor: Colors.white,
@@ -343,7 +343,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: TextField(
                       controller: _codeController,
                       decoration: InputDecoration(
-                        hintText: "Enter Code",
+                        hintText: "Εισαγωγή Κώδικα",
                         isDense: true,
                         filled: true,
                         fillColor: Theme.of(context).cardColor,
@@ -362,7 +362,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         
                         if (mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text("Classroom joined successfully!")),
+                            const SnackBar(content: Text("Εγγραφή στην τάξη πραγματοποιήθηκε επιτυχώς!")),
                           );
                           _codeController.clear();
                         }
@@ -373,7 +373,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
-                    child: const Text("Submit"),
+                    child: const Text("Υποβολή"),
                   ),
                 ],
               ),

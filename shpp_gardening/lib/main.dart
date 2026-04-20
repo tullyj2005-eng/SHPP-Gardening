@@ -163,8 +163,8 @@ class _HomePageState extends State<HomePage> {
           body: widgetOptions.elementAt(_selectedIndex),
           bottomNavigationBar: BottomNavigationBar(
             items: const [
-              BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-              BottomNavigationBarItem(icon: Icon(Icons.info_outline), label: 'Info'),
+              BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Αρχική'),
+              BottomNavigationBarItem(icon: Icon(Icons.info_outline), label: 'Πληροφορίες'),
             ],
             currentIndex: _selectedIndex,
             selectedItemColor: const Color(0xFF2E7D32),

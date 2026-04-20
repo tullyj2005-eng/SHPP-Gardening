@@ -43,7 +43,7 @@ class _InfoScreenState extends State<InfoScreen> {
               children: [
                 DrawerHeader(
                   child: Text(
-                    'Categories', 
+                    'Κατηγορίες', 
                     style: TextStyle(
                       fontSize: 20, 
                       fontWeight: FontWeight.bold,
@@ -61,7 +61,7 @@ class _InfoScreenState extends State<InfoScreen> {
                         : (isDark ? Colors.greenAccent : Colors.green),
                   ),
                   title: Text(
-                    'Aromatics',
+                    'Αρωματικά',
                     style: TextStyle(
                       // UPDATED: Title text color
                       color: (isDark || ThemeManager.isRedMode) ? Colors.white70 : Colors.black87
@@ -87,7 +87,7 @@ class _InfoScreenState extends State<InfoScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Aromatics', 
+                            'Αρωματικά', 
                             style: TextStyle(
                               fontSize: 26, 
                               fontWeight: FontWeight.bold, 
