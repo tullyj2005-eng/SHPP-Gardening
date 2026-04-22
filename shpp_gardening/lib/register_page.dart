@@ -46,7 +46,7 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Create Account"), backgroundColor: Colors.green),
+      appBar: AppBar(title: const Text("Δημιουργία Λογαριασμού"), backgroundColor: Colors.green),
       body: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
@@ -58,7 +58,7 @@ class _RegisterPageState extends State<RegisterPage> {
             // ROLE DROPDOWN
             DropdownButtonFormField<String>(
               initialValue: _selectedRole,
-              decoration: const InputDecoration(labelText: "Register as"),
+              decoration: const InputDecoration(labelText: "Εγγραφή ως"),
               items: ['Student', 'Teacher'].map((role) {
                 return DropdownMenuItem(value: role, child: Text(role));
               }).toList(),
@@ -68,7 +68,7 @@ class _RegisterPageState extends State<RegisterPage> {
             const SizedBox(height: 24),
             _isLoading 
               ? const CircularProgressIndicator() 
-              : ElevatedButton(onPressed: _onRegisterPressed, child: const Text("Register")),
+              : ElevatedButton(onPressed: _onRegisterPressed, child: const Text("Εγγραφή")),
           ],
         ),
       ),

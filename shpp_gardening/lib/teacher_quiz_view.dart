@@ -18,7 +18,7 @@ class _TeacherQuizViewState extends State<TeacherQuizView> {
   
   // Posts a quiz containing multiple questions to the specific classroom
   void _postFromBank(Quiz quiz) async {
-    // We must convert the Question objects into Maps for Firestore
+    // Convert Question objects into Maps for Firestore
     final List<Map<String, dynamic>> serializedQuestions = quiz.questions.map((q) {
       return {
         'questionText': q.questionText,
@@ -39,25 +39,62 @@ class _TeacherQuizViewState extends State<TeacherQuizView> {
       if (mounted) {
         Navigator.pop(context); // Close the selection dialog
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Successfully assigned '${quiz.title}'")),
+          SnackBar(content: Text("Ολοκληρώθηκε η ανάθεση :'${quiz.title}'")),
         );
       }
     } catch (e) {
-      debugPrint("Error posting quiz: $e");
+      debugPrint("Πρόβλημα στην ανάρτηση του κουίζ: $e");
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    // --- THE GATEKEEPER ---
+    // This prevents the "Invalid Argument" crash by checking the path before Firestore sees it.
+    if (widget.classCode.trim().isEmpty) {
+      return Scaffold(
+        appBar: AppBar(title: const Text("Σφάλμα Κωδικού")),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.error_outline, size: 60, color: Colors.orange),
+                const SizedBox(height: 16),
+                const Text(
+                  "Δεν βρέθηκε έγκυρος κωδικός τάξης.",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  "Παρακαλώ επιστρέψτε στην αρχική και δημιουργήστε έναν κωδικό τάξης πριν ανοίξετε το Dashboard.",
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text("Επιστροφή"),
+                )
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    // --- MAIN DASHBOARD UI ---
+    // This only runs if widget.classCode is a non-empty string.
     return Scaffold(
       appBar: AppBar(
-        title: Text("Teacher Dashboard: ${widget.classCode}"),
+        title: Text("Οθόνη δασκάλου: ${widget.classCode}"),
         backgroundColor: Colors.green.shade800,
         foregroundColor: Colors.white,
       ),
       body: Column(
         children: [
-          _buildSectionHeader("Quizzes Currently in Classroom"),
+          _buildSectionHeader("Ενεργά Κουίζ στην τάξη αυτή τη στιγμή"),
           Expanded(
             flex: 2,
             child: StreamBuilder<QuerySnapshot>(
@@ -67,13 +104,13 @@ class _TeacherQuizViewState extends State<TeacherQuizView> {
                   .collection('activeQuizzes')
                   .snapshots(),
               builder: (context, snapshot) {
-                if (snapshot.hasError) return const Center(child: Text("Error loading quizzes"));
+                if (snapshot.hasError) return const Center(child: Text("Σφάλμα φόρτωσης κουίζ"));
                 if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
                 
                 final docs = snapshot.data!.docs;
                 if (docs.isEmpty) {
                   return const Center(
-                    child: Text("No active quizzes. Use the + button to assign one."),
+                    child: Text("Κανένα ενεργό κουίζ. Πατήστε το κουμπί + για να αναθέσετε ένα."),
                   );
                 }
 
@@ -90,9 +127,8 @@ class _TeacherQuizViewState extends State<TeacherQuizView> {
                         child: Icon(Icons.menu_book, color: Colors.white, size: 20),
                       ),
                       title: Text(data['title'] ?? 'Untitled Quiz'),
-                      subtitle: Text("${questionsList.length} Questions • Tap to Preview"),
+                      subtitle: Text("${questionsList.length} Ερωτήσεις • Πατήστε για λεπτομέρειες"),
                       onTap: () {
-                        // Pass the data to the Play View for teacher preview
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -113,7 +149,7 @@ class _TeacherQuizViewState extends State<TeacherQuizView> {
           
           const Divider(thickness: 2),
 
-          _buildSectionHeader("Student Progress"),
+          _buildSectionHeader("Πρόοδος μαθητών"),
           Expanded(
             flex: 3,
             child: StreamBuilder<QuerySnapshot>(
@@ -122,7 +158,7 @@ class _TeacherQuizViewState extends State<TeacherQuizView> {
                 if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
                 final results = snapshot.data!.docs;
 
-                if (results.isEmpty) return const Center(child: Text("No results submitted yet."));
+                if (results.isEmpty) return const Center(child: Text("Κανένα αποτέλεσμα δεν έχει υποβληθεί ακόμα."));
 
                 return ListView.builder(
                   itemCount: results.length,
@@ -140,7 +176,7 @@ class _TeacherQuizViewState extends State<TeacherQuizView> {
                           border: Border.all(color: Colors.green),
                         ),
                         child: Text(
-                          "Score: ${res['score']}", 
+                          "Βαθμολογία: ${res['score']}", 
                           style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green),
                         ),
                       ),
@@ -181,7 +217,7 @@ class _TeacherQuizViewState extends State<TeacherQuizView> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("Assign from Quiz Bank"),
+        title: const Text("Αναθέστε κουίζ από την Τράπεζα Κουίζ"),
         content: SizedBox(
           width: double.maxFinite,
           child: ListView.separated(
@@ -192,7 +228,7 @@ class _TeacherQuizViewState extends State<TeacherQuizView> {
               final quiz = quizBank[index];
               return ListTile(
                 title: Text(quiz.title, style: const TextStyle(fontWeight: FontWeight.w500)),
-                subtitle: Text("${quiz.questions.length} Items"),
+                subtitle: Text("${quiz.questions.length} Ερωτήσεις"),
                 trailing: const Icon(Icons.send, color: Colors.green, size: 20),
                 onTap: () => _postFromBank(quiz),
               );
@@ -202,10 +238,10 @@ class _TeacherQuizViewState extends State<TeacherQuizView> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context), 
-            child: const Text("Cancel"),
+            child: const Text("Ακύρωση"),
           ),
         ],
       ),
     );
   }
-}
+} //2,334 lines of code in the whole project at the time of this comment - niko geussed 2337

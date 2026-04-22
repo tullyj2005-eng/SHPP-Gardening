@@ -70,7 +70,7 @@ class AccountLogic {
         return TrackedPlant(
           name: doc['name'] ?? 'Unknown Plant',
           lastWatered: (doc['lastWatered'] as Timestamp).toDate(),
-          thirstDuration: Duration(seconds: doc['thirstDuration'] ?? 21600),
+          thirstDuration: Duration(seconds: doc['thirstDuration'] ?? 21600), //ToDo adjust to be oer plant
         );
       }).toList();
     });

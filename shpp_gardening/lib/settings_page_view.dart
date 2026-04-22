@@ -59,17 +59,24 @@ class _SettingsPageState extends State<SettingsPage> {
           _buildInfoStep(Icons.opacity, "Μετρητής νερού", "Ο μετρητής νερού δείχνει πόσο νερό χρειάζεται το φυτό σας, βάσει των ρυθμίσεων σας."),
           _buildInfoStep(Icons.quiz, "Τεστ γνώσεων", "Οι δάσκαλοι μπορούν να δημοσιεύσουν τεστ στους κωδικούς τάξης για να σας βοηθήσουν να μάθετε καλύτερα τη φροντίδα των φυτών."),
           _buildInfoStep(Icons.touch_app, "Οδηγός φροντίδας", "Διαλέξτε οποιοδήποτε φυτό για να δείτε λεπτομερείς οδηγίες για την καλύτερη ανάπτυξή τους."),
-          _buildInfoStep(Icons.info, "Αφαίρεση", "To remove a plant from you garden, simply long press on it and confirm removal. This will not delete the plant from your library, so you can add it back anytime!"),
+          _buildInfoStep(Icons.info, "Αφαίρεση", "Για να αφαιρέσετε ένα φυτό από τον κήπο σας, απλώς πατήστε συνεχόμενα επάνω και επιβεβαιώστε τη διαγραφή. Το φυτό σας δε θα διαγραφεί από τη βιβλιοθήκη σας, οπότε μπορείτε να το προσθέσετε ξανά οποιαδήποτε στιγμή!"),
         ]
       ),
     );
   }
 
   Widget _buildInfoStep(IconData icon, String title, String desc) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final bool isRed = ThemeManager.isRedMode;
+    final Color iconColor = (isDark || isRed) ? Colors.white : Theme.of(context).primaryColor;
+    final Color avatarBg = isDark
+        ? Colors.white12
+        : (isRed ? Colors.red.shade700 : Theme.of(context).primaryColor.withOpacity(0.1));
+
     return ListTile(
       leading: CircleAvatar(
-        backgroundColor: Theme.of(context).primaryColor.withOpacity(0.1), 
-        child: Icon(icon, color: Theme.of(context).primaryColor)
+        backgroundColor: avatarBg,
+        child: Icon(icon, color: iconColor),
       ),
       title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
       subtitle: Text(desc),

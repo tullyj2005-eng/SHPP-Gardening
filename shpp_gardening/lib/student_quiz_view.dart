@@ -17,7 +17,7 @@ class StudentQuizView extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Available Quizzes"),
+        title: const Text("Διαθέσιμα Κουίζ"),
         backgroundColor: Colors.green,
         foregroundColor: Colors.white,
       ),
@@ -60,7 +60,7 @@ class StudentQuizView extends StatelessWidget {
                       Icon(Icons.check_circle_outline, color: Colors.green, size: 80),
                       SizedBox(height: 16),
                       Text(
-                        "ALL QUIZZES COMPLETE!",
+                        "ΌΛΑ ΤΑ ΚΟΥΙΖ ΟΛΟΚΛΗΡΩΘΗΚΑΝ!",
                         style: TextStyle(
                           fontSize: 20, 
                           fontWeight: FontWeight.bold,
@@ -69,7 +69,7 @@ class StudentQuizView extends StatelessWidget {
                         ),
                       ),
                       SizedBox(height: 8),
-                      Text("Check back later for new challenges.", style: TextStyle(color: Colors.grey)),
+                      Text("Έλα ξανά αργότερα για νέες προκλήσεις!", style: TextStyle(color: Colors.grey)),
                     ],
                   ),
                 );
@@ -94,7 +94,7 @@ class StudentQuizView extends StatelessWidget {
                         ),
                       ),
                       title: Text(data['title'] ?? 'Untitled Quiz', style: const TextStyle(fontWeight: FontWeight.bold)),
-                      subtitle: Text(isRiddle ? "Riddle Challenge" : "Multiple Choice"),
+                      subtitle: Text(isRiddle ? "Πρόκληση γρίφου" : "Πολλαπλής επιλογής"),
                       trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                       onTap: () {
                         Navigator.push(

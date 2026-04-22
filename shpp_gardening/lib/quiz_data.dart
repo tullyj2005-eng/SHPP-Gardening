@@ -189,7 +189,7 @@ final dittanyQuestions = [
     questionText: "Πως θα πρέπει να αποξηραίνεται το δίκταμο μετά τη συγκομιδή;",
     type: "multiple_choice",
     correctAnswer: "Σε σκοτεινό, ξηρό μέρος ή στους 35°C σε ξηραντήριο",
-    options: ["Σε άμεσο ηλιακό φως σε εξωτερικό χώρο", "Σε σφαγεισμένα υγρα δοχεία", "Σε σκοτεινό, ξηρό μέρος ή στους 35°C σε ξηραντήριο", "Με κατάψυξη και στη συνέχεια απόψυξη"],
+    options: ["Σε άμεσο ηλιακό φως σε εξωτερικό χώρο", "Σε σφραγισμένα υγρά δοχεία", "Σε σκοτεινό, ξηρό μέρος ή στους 35°C σε ξηραντήριο", "Με κατάψυξη και στη συνέχεια απόψυξη"],
   ),
 ];
 
@@ -244,17 +244,17 @@ final rosemaryQuestions = [
 final List<Quiz> quizBank = [
   Quiz(
     id: "Oregano_Quiz",
-    title: "Oregano Quiz",
+    title: "Κουίζ Ρίγανης",
     questions: oreganoQuestions,
   ),
   Quiz(
     id: "Sage_Quiz",
-    title: "Sage Quiz",
+    title: "Κουίζ Φασκόμηλου",
     questions: sageQuestions,
   ),
   Quiz(
     id: "Dittany_Quiz",
-    title: "Dittany Quiz",
+    title: "Κουίζ Δικτάμου",
     questions: dittanyQuestions,
   ),
 ];
