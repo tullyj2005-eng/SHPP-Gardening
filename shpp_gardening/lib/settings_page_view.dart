@@ -50,7 +50,22 @@ class _SettingsPageState extends State<SettingsPage> {
           
           const Divider(),
 
-          // --- HOW IT WORKS SECTION ---
+          // --- MUSIC TOGGLE ---
+          ValueListenableBuilder<bool>(
+            valueListenable: ThemeManager.isMuted,
+            builder: (context, muted, child) {
+              return SwitchListTile(
+                secondary: Icon(muted ? Icons.music_off : Icons.music_note,
+                    color: muted ? Colors.grey : Colors.green),
+                title: const Text("Μουσική υπόκρουση"),
+                subtitle: Text(muted ? "Σίγαση" : "Ενεργή"),
+                value: !muted,
+                onChanged: (bool value) => ThemeManager.setMuted(!value),
+              );
+            },
+          ),
+
+          const Divider(),
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 16),
             child: Text("Τρόπος λειτουργίας", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),

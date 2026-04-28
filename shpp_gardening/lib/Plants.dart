@@ -232,6 +232,31 @@ Widget oregano(BuildContext context, VoidCallback onTrack) {
 
 
 
+// Generic card for Firestore-added plants (no image, uses a leaf icon)
+Widget plantCard(BuildContext context, String name, String description, String howTo, VoidCallback onTrack) {
+  return InkWell(
+    onTap: () => showPlantDetails(context, name, description, howTo, onTrack),
+    child: Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Icon(Icons.local_florist, size: 80, color: Colors.green),
+          ),
+          Text(
+            name,
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 10),
+        ],
+      ),
+    ),
+  );
+}
+
 //popup function for the plant information
 void showPlantDetails(
   BuildContext context, 

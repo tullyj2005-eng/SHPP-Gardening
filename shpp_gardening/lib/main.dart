@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'firebase_options.dart';
 
 // Your file imports
@@ -10,6 +11,7 @@ import 'info_screen.dart';
 import 'login_page.dart';
 import 'home_page.dart'; 
 import 'settings_logic.dart';
+import 'tracked_plant.dart';
 
 // 1. Move Theme Definitions outside the widget tree to avoid syntax errors
 final ThemeData greenTheme = ThemeData(
@@ -33,6 +35,9 @@ final ThemeData redTheme = ThemeData(
     secondary: const Color.fromARGB(255, 161, 16, 3),
   ),
 );
+
+// Global audio player — lives for the lifetime of the app
+final AudioPlayer globalAudioPlayer = AudioPlayer();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -104,25 +109,6 @@ class AuthCheck extends StatelessWidget {
   }
 }
 
-// --- PLANT MODEL ---
-class TrackedPlant {
-  final String name;
-  final DateTime lastWatered;
-  final Duration thirstDuration;
-
-  TrackedPlant({
-    required this.name, 
-    required this.lastWatered, 
-    this.thirstDuration = const Duration(hours: 6),
-  });
-
-  double get waterProgress {
-    final timePassed = DateTime.now().difference(lastWatered);
-    double progress = timePassed.inSeconds / thirstDuration.inSeconds;
-    return progress.clamp(0.0, 1.0);
-  }
-}
-
 // --- HOME PAGE (NAVIGATION) ---
 class HomePage extends StatefulWidget {
   final String userRole;
@@ -134,6 +120,37 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
+  bool _musicStarted = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Music is started on first user interaction via the GestureDetector in build()
+    // to comply with browser autoplay policy — calling play() here causes a freeze on web.
+    ThemeManager.isMuted.addListener(_onMuteChanged);
+  }
+
+  @override
+  void dispose() {
+    ThemeManager.isMuted.removeListener(_onMuteChanged);
+    super.dispose();
+  }
+
+  void _onMuteChanged() {
+    if (ThemeManager.isMuted.value) {
+      globalAudioPlayer.pause();
+    } else {
+      if (_musicStarted) {
+        globalAudioPlayer.resume();
+      }
+      // If not started yet, the GestureDetector will start it on next tap
+    }
+  }
+
+  void _startMusic() async {
+    await globalAudioPlayer.setReleaseMode(ReleaseMode.loop);
+    await globalAudioPlayer.play(AssetSource('audio/soundtrack.wav'));
+  }
 
   void _handleTracking(String plantName) async {
     final user = FirebaseAuth.instance.currentUser;
@@ -159,16 +176,24 @@ class _HomePageState extends State<HomePage> {
           InfoScreen(onTrack: _handleTracking),
         ];
 
-        return Scaffold(
-          body: widgetOptions.elementAt(_selectedIndex),
-          bottomNavigationBar: BottomNavigationBar(
-            items: const [
-              BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Αρχική'),
-              BottomNavigationBarItem(icon: Icon(Icons.info_outline), label: 'Πληροφορίες'),
-            ],
-            currentIndex: _selectedIndex,
-            selectedItemColor: const Color(0xFF2E7D32),
-            onTap: (index) => setState(() => _selectedIndex = index),
+        return GestureDetector(
+          onTap: () {
+            if (!_musicStarted && !ThemeManager.isMuted.value) {
+              _musicStarted = true;
+              _startMusic();
+            }
+          },
+          child: Scaffold(
+            body: widgetOptions.elementAt(_selectedIndex),
+            bottomNavigationBar: BottomNavigationBar(
+              items: const [
+                BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Αρχική'),
+                BottomNavigationBarItem(icon: Icon(Icons.info_outline), label: 'Πληροφορίες'),
+              ],
+              currentIndex: _selectedIndex,
+              selectedItemColor: const Color(0xFF2E7D32),
+              onTap: (index) => setState(() => _selectedIndex = index),
+            ),
           ),
         );
       }

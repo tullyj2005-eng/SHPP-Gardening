@@ -8,8 +8,10 @@ environment:
   sdk: '>=3.5.0 <4.0.0'
 
 dependencies:
+  audioplayers: ^6.0.0
   flutter:
     sdk: flutter
+
 
   cupertino_icons: ^1.0.8
   
@@ -28,6 +30,7 @@ flutter:
     - assets/
     - assets/Thyme.png
     - assets/Leaf (1).png
+    - assets/audio/soundtrack.wav
 
 
 

@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'main.dart'; 
+import 'tracked_plant.dart';
 import 'dart:math';
 
 class AccountLogic {

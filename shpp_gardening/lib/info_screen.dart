@@ -1,6 +1,7 @@
 import 'plants.dart'; 
 import 'package:flutter/material.dart';
-import 'settings_logic.dart'; // Ensure this is imported for ThemeManager access
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'settings_logic.dart';
 
 // --- INFO SCREEN ---
 class InfoScreen extends StatefulWidget {
@@ -33,12 +34,11 @@ class _InfoScreenState extends State<InfoScreen> {
           // --- CATEGORY SIDEBAR ---
           Container(
             width: 200,
-            // UPDATED: Logic for Deep Red Sidebar
             color: isDark 
                 ? const Color(0xFF1A1C1E) 
                 : (ThemeManager.isRedMode 
-                    ? const Color.fromARGB(255, 120, 10, 0) // Deep Red
-                    : Colors.green.shade50),                 // Standard Light Green
+                    ? const Color.fromARGB(255, 120, 10, 0)
+                    : Colors.green.shade50),
             child: ListView(
               children: [
                 DrawerHeader(
@@ -47,7 +47,6 @@ class _InfoScreenState extends State<InfoScreen> {
                     style: TextStyle(
                       fontSize: 20, 
                       fontWeight: FontWeight.bold,
-                      // UPDATED: Text color for readability
                       color: (isDark || ThemeManager.isRedMode) ? Colors.white : Colors.black87,
                     )
                   )
@@ -55,7 +54,6 @@ class _InfoScreenState extends State<InfoScreen> {
                 ListTile(
                   leading: Icon(
                     Icons.spa, 
-                    // UPDATED: Icon color
                     color: ThemeManager.isRedMode 
                         ? Colors.white70 
                         : (isDark ? Colors.greenAccent : Colors.green),
@@ -63,7 +61,6 @@ class _InfoScreenState extends State<InfoScreen> {
                   title: Text(
                     'Αρωματικά',
                     style: TextStyle(
-                      // UPDATED: Title text color
                       color: (isDark || ThemeManager.isRedMode) ? Colors.white70 : Colors.black87
                     ),
                   ),
@@ -77,46 +74,71 @@ class _InfoScreenState extends State<InfoScreen> {
           Expanded(
             child: LayoutBuilder(
               builder: (context, constraints) {
-                return ListView(
-                  padding: const EdgeInsets.all(16),
-                  children: [
-                    Padding(
-                      key: _aromaticsKey,
-                      padding: const EdgeInsets.only(top: 10.0, bottom: 20.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Αρωματικά', 
-                            style: TextStyle(
-                              fontSize: 26, 
-                              fontWeight: FontWeight.bold, 
-                              // UPDATED: Title color to match Red Theme
-                              color: ThemeManager.isRedMode
-                                  ? const Color.fromARGB(255, 161, 16, 3) // Deep Red Title
-                                  : (isDark ? Colors.greenAccent : Colors.green.shade900),
-                            )
+                return StreamBuilder<QuerySnapshot>(
+                  stream: FirebaseFirestore.instance
+                      .collection('plants')
+                      .orderBy('createdAt', descending: false)
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    // Build dynamic plant cards from Firestore
+                    List<Widget> dynamicCards = [];
+                    if (snapshot.hasData) {
+                      dynamicCards = snapshot.data!.docs.map((doc) {
+                        final data = doc.data() as Map<String, dynamic>;
+                        final name = data['name'] ?? '';
+                        return plantCard(
+                          context,
+                          name,
+                          data['description'] ?? '',
+                          data['howTo'] ?? '',
+                          () => widget.onTrack(name),
+                        );
+                      }).toList();
+                    }
+
+                    return ListView(
+                      padding: const EdgeInsets.all(16),
+                      children: [
+                        Padding(
+                          key: _aromaticsKey,
+                          padding: const EdgeInsets.only(top: 10.0, bottom: 20.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Αρωματικά', 
+                                style: TextStyle(
+                                  fontSize: 26, 
+                                  fontWeight: FontWeight.bold, 
+                                  color: ThemeManager.isRedMode
+                                      ? const Color.fromARGB(255, 161, 16, 3)
+                                      : (isDark ? Colors.greenAccent : Colors.green.shade900),
+                                )
+                              ),
+                              const SizedBox(height: 4),
+                              Container(
+                                height: 2, 
+                                width: 100, 
+                                color: ThemeManager.isRedMode
+                                    ? const Color.fromARGB(255, 161, 16, 3).withOpacity(0.5)
+                                    : (isDark ? Colors.greenAccent.withOpacity(0.5) : Colors.green.shade300),
+                              ),
+                            ],
                           ),
-                          const SizedBox(height: 4),
-                          Container(
-                            height: 2, 
-                            width: 100, 
-                            // UPDATED: Underline color
-                            color: ThemeManager.isRedMode
-                                ? const Color.fromARGB(255, 161, 16, 3).withOpacity(0.5)
-                                : (isDark ? Colors.greenAccent.withOpacity(0.5) : Colors.green.shade300),
-                          ),
-                        ],
-                      ),
-                    ),
-                    _buildResponsiveGrid(constraints.maxWidth, [
-                      mint(context, () => widget.onTrack('Μέντα')),
-                      rosemary(context, () => widget.onTrack('Δεντρολίβανο')),
-                      dittany(context, () => widget.onTrack('Δίκταμο')),
-                      thyme(context, () => widget.onTrack('Θυμάρι')),
-                      oregano(context, () => widget.onTrack('Ρίγανη')),
-                    ]),
-                  ],
+                        ),
+                        _buildResponsiveGrid(constraints.maxWidth, [
+                          // Hardcoded originals always shown first
+                          mint(context, () => widget.onTrack('Μέντα')),
+                          rosemary(context, () => widget.onTrack('Δεντρολίβανο')),
+                          dittany(context, () => widget.onTrack('Δίκταμο')),
+                          thyme(context, () => widget.onTrack('Θυμάρι')),
+                          oregano(context, () => widget.onTrack('Ρίγανη')),
+                          // Firestore-added plants appear after
+                          ...dynamicCards,
+                        ]),
+                      ],
+                    );
+                  },
                 );
               },
             ),

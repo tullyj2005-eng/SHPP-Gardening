@@ -8,7 +8,10 @@ import 'plants.dart';
 import 'settings_page_view.dart';
 import 'teacher_quiz_view.dart';
 import 'student_quiz_view.dart';
+import 'admin_panel.dart';
 import 'account_logic.dart';
+import 'tracked_plant.dart';
+import 'info_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final List<TrackedPlant> tracked;
@@ -62,7 +65,7 @@ class _HomeScreenState extends State<HomeScreen> {
       final data = userDoc.data() as Map<String, dynamic>?;
       String finalCode = (data?['myClassCode'] ?? data?['classCode']) ?? "";
       if (mounted) {
-        if (widget.userRole == 'Teacher') {
+        if (widget.userRole == 'Teacher' || widget.userRole == 'Moderator') {
           Navigator.push(context, MaterialPageRoute(builder: (context) => TeacherQuizView(classCode: finalCode)));
         } else {
           Navigator.push(context, MaterialPageRoute(builder: (context) => StudentQuizView(classCode: finalCode)));
@@ -98,6 +101,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 const Icon(Icons.account_circle, size: 80, color: Colors.grey),
                 const SizedBox(height: 20),
                 _buildSidebarItem(Icons.quiz_outlined, "Κουίζ", () => _openQuiz(context)),
+                if (widget.userRole == 'Moderator')
+                  _buildSidebarItem(Icons.admin_panel_settings, "Admin Panel", () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => const AdminPanel()));
+                  }),
                 _buildSidebarItem(Icons.settings, "Ρυθμίσεις", () {
                   Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingsPage()));
                 }),
@@ -261,7 +268,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildClassroomSlot(Color txt, Color sub) {
-    bool isTeacher = widget.userRole == 'Teacher';
+    bool isTeacher = widget.userRole == 'Teacher' || widget.userRole == 'Moderator';
     bool isDark = Theme.of(context).brightness == Brightness.dark;
     bool isRed = ThemeManager.isRedMode;
     // This container is dark in red and dark mode, so its internal text must always be white

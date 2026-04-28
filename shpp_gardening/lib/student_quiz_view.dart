@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'quiz_play_view.dart'; 
+import 'quiz_play_view.dart';
 
 class StudentQuizView extends StatelessWidget {
   final String classCode;
@@ -30,7 +30,6 @@ class StudentQuizView extends StatelessWidget {
           if (userSnapshot.hasError) return Center(child: Text("Error: ${userSnapshot.error}"));
           if (!userSnapshot.hasData) return const Center(child: CircularProgressIndicator());
 
-          // FIX: Use .data() and the null-aware operator to check if field exists
           final userData = userSnapshot.data?.data() as Map<String, dynamic>?;
           List<dynamic> completedTitles = userData != null && userData.containsKey('completedQuizzes')
               ? userData['completedQuizzes']
@@ -51,7 +50,6 @@ class StudentQuizView extends StatelessWidget {
                 return !completedTitles.contains(quizTitle);
               }).toList();
 
-              // UI UPDATE: Show central text when all quizzes are finished
               if (availableQuizzes.isEmpty) {
                 return const Center(
                   child: Column(
