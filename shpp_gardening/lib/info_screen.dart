@@ -92,6 +92,7 @@ class _InfoScreenState extends State<InfoScreen> {
                           data['description'] ?? '',
                           data['howTo'] ?? '',
                           () => widget.onTrack(name),
+                          imageUrl: data['imageUrl'],
                         );
                       }).toList();
                     }

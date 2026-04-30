@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'dart:typed_data';
 
 class AdminPanel extends StatefulWidget {
   const AdminPanel({super.key});
@@ -136,7 +139,6 @@ class _QuizCreatorTabState extends State<_QuizCreatorTab> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          // Quiz title
           TextField(
             controller: _titleController,
             decoration: const InputDecoration(
@@ -146,8 +148,6 @@ class _QuizCreatorTabState extends State<_QuizCreatorTab> {
             ),
           ),
           const SizedBox(height: 16),
-
-          // Questions
           ..._questions.asMap().entries.map((entry) {
             final i = entry.key;
             final q = entry.value;
@@ -158,8 +158,6 @@ class _QuizCreatorTabState extends State<_QuizCreatorTab> {
               onChanged: () => setState(() {}),
             );
           }),
-
-          // Add question button
           OutlinedButton.icon(
             onPressed: _addQuestion,
             icon: const Icon(Icons.add),
@@ -168,7 +166,6 @@ class _QuizCreatorTabState extends State<_QuizCreatorTab> {
               minimumSize: const Size(double.infinity, 50),
             ),
           ),
-
           const SizedBox(height: 80),
         ],
       ),
@@ -191,7 +188,9 @@ class _QuizCreatorTabState extends State<_QuizCreatorTab> {
   }
 }
 
-// Holds mutable state for one question being drafted
+// ─────────────────────────────────────────
+// QUESTION DRAFT MODEL
+// ─────────────────────────────────────────
 class _QuestionDraft {
   final TextEditingController questionController = TextEditingController();
   final TextEditingController answerController = TextEditingController();
@@ -240,8 +239,6 @@ class _QuestionCardState extends State<_QuestionCard> {
               ],
             ),
             const SizedBox(height: 8),
-
-            // Type toggle
             SegmentedButton<String>(
               segments: const [
                 ButtonSegment(value: 'multiple_choice', label: Text("Πολλαπλής"), icon: Icon(Icons.list)),
@@ -251,8 +248,6 @@ class _QuestionCardState extends State<_QuestionCard> {
               onSelectionChanged: (s) => setState(() => d.type = s.first),
             ),
             const SizedBox(height: 12),
-
-            // Question text
             TextField(
               controller: d.questionController,
               maxLines: 2,
@@ -262,8 +257,6 @@ class _QuestionCardState extends State<_QuestionCard> {
               ),
             ),
             const SizedBox(height: 8),
-
-            // Correct answer
             TextField(
               controller: d.answerController,
               decoration: const InputDecoration(
@@ -272,8 +265,6 @@ class _QuestionCardState extends State<_QuestionCard> {
                 prefixIcon: Icon(Icons.check_circle_outline, color: Colors.green),
               ),
             ),
-
-            // Options (only for multiple choice)
             if (d.type == 'multiple_choice') ...[
               const SizedBox(height: 12),
               const Text("Επιλογές (τουλάχιστον 2):",
@@ -315,6 +306,30 @@ class _PlantCreatorTabState extends State<_PlantCreatorTab> {
   final _howToController = TextEditingController();
   bool _isSaving = false;
 
+  Uint8List? _imageBytes;
+  String? _imageFileName;
+
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(source: ImageSource.gallery, maxWidth: 800);
+    if (picked == null) return;
+    final bytes = await picked.readAsBytes();
+    setState(() {
+      _imageBytes = bytes;
+      _imageFileName = picked.name;
+    });
+  }
+
+  Future<String?> _uploadImage(String plantName) async {
+    if (_imageBytes == null) return null;
+    final ext = _imageFileName?.split('.').last ?? 'jpg';
+    final ref = FirebaseStorage.instance
+        .ref()
+        .child('plant_images/${plantName.replaceAll(' ', '_')}_${DateTime.now().millisecondsSinceEpoch}.$ext');
+    await ref.putData(_imageBytes!, SettableMetadata(contentType: 'image/$ext'));
+    return await ref.getDownloadURL();
+  }
+
   Future<void> _savePlant() async {
     if (_nameController.text.trim().isEmpty ||
         _descriptionController.text.trim().isEmpty ||
@@ -327,11 +342,15 @@ class _PlantCreatorTabState extends State<_PlantCreatorTab> {
 
     setState(() => _isSaving = true);
 
+    final plantName = _nameController.text.trim();
+    final imageUrl = await _uploadImage(plantName);
+
     await FirebaseFirestore.instance.collection('plants').add({
-      'name': _nameController.text.trim(),
+      'name': plantName,
       'category': _categoryController.text.trim().isEmpty ? 'Αρωματικά' : _categoryController.text.trim(),
       'description': _descriptionController.text.trim(),
       'howTo': _howToController.text.trim(),
+      if (imageUrl != null) 'imageUrl': imageUrl,
       'createdAt': FieldValue.serverTimestamp(),
     });
 
@@ -341,6 +360,8 @@ class _PlantCreatorTabState extends State<_PlantCreatorTab> {
       _categoryController.clear();
       _descriptionController.clear();
       _howToController.clear();
+      _imageBytes = null;
+      _imageFileName = null;
     });
 
     if (mounted) {
@@ -355,10 +376,8 @@ class _PlantCreatorTabState extends State<_PlantCreatorTab> {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        const Text(
-          "Νέα κάρτα φυτού",
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
+        const Text("Νέα κάρτα φυτού",
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
         const SizedBox(height: 4),
         const Text(
           "Το φυτό θα εμφανιστεί αμέσως στην οθόνη Πληροφοριών για όλους τους χρήστες.",
@@ -406,6 +425,46 @@ class _PlantCreatorTabState extends State<_PlantCreatorTab> {
             alignLabelWithHint: true,
           ),
         ),
+        const SizedBox(height: 16),
+
+        // --- IMAGE PICKER ---
+        GestureDetector(
+          onTap: _pickImage,
+          child: Container(
+            height: 160,
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.green.shade300, width: 2),
+              borderRadius: BorderRadius.circular(12),
+              color: Colors.green.shade50,
+            ),
+            child: _imageBytes != null
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Image.memory(_imageBytes!, fit: BoxFit.cover, width: double.infinity),
+                  )
+                : Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.add_photo_alternate_outlined, size: 48, color: Colors.green.shade400),
+                      const SizedBox(height: 8),
+                      Text("Πατήστε για επιλογή εικόνας (προαιρετικό)",
+                          style: TextStyle(color: Colors.green.shade600)),
+                    ],
+                  ),
+          ),
+        ),
+        if (_imageBytes != null) ...[
+          const SizedBox(height: 6),
+          TextButton.icon(
+            onPressed: () => setState(() {
+              _imageBytes = null;
+              _imageFileName = null;
+            }),
+            icon: const Icon(Icons.close, size: 16, color: Colors.redAccent),
+            label: const Text("Αφαίρεση εικόνας", style: TextStyle(color: Colors.redAccent)),
+          ),
+        ],
+
         const SizedBox(height: 24),
 
         SizedBox(
@@ -429,10 +488,10 @@ class _PlantCreatorTabState extends State<_PlantCreatorTab> {
         const Divider(),
         const SizedBox(height: 12),
 
-        // Live list of existing Firestore plants
         const Text("Φυτά στη βάση δεδομένων",
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
         const SizedBox(height: 8),
+
         StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance
               .collection('plants')
@@ -448,7 +507,13 @@ class _PlantCreatorTabState extends State<_PlantCreatorTab> {
               children: snap.data!.docs.map((doc) {
                 final data = doc.data() as Map<String, dynamic>;
                 return ListTile(
-                  leading: const Icon(Icons.local_florist, color: Colors.green),
+                  leading: data['imageUrl'] != null
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(6),
+                          child: Image.network(data['imageUrl'],
+                              width: 40, height: 40, fit: BoxFit.cover),
+                        )
+                      : const Icon(Icons.local_florist, color: Colors.green),
                   title: Text(data['name'] ?? ''),
                   subtitle: Text(data['category'] ?? ''),
                   trailing: IconButton(

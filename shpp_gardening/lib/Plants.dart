@@ -232,8 +232,8 @@ Widget oregano(BuildContext context, VoidCallback onTrack) {
 
 
 
-// Generic card for Firestore-added plants (no image, uses a leaf icon)
-Widget plantCard(BuildContext context, String name, String description, String howTo, VoidCallback onTrack) {
+// Generic card for Firestore-added plants
+Widget plantCard(BuildContext context, String name, String description, String howTo, VoidCallback onTrack, {String? imageUrl}) {
   return InkWell(
     onTap: () => showPlantDetails(context, name, description, howTo, onTrack),
     child: Card(
@@ -242,15 +242,32 @@ Widget plantCard(BuildContext context, String name, String description, String h
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Padding(
-            padding: EdgeInsets.all(8.0),
-            child: Icon(Icons.local_florist, size: 80, color: Colors.green),
+          ClipRRect(
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
+            child: imageUrl != null
+                ? Image.network(
+                    imageUrl,
+                    height: 100,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => const SizedBox(
+                      height: 100,
+                      child: Icon(Icons.local_florist, size: 60, color: Colors.green),
+                    ),
+                  )
+                : const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Icon(Icons.local_florist, size: 80, color: Colors.green),
+                  ),
           ),
-          Text(
-            name,
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              name,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 6),
         ],
       ),
     ),
