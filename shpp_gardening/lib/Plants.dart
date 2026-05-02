@@ -90,7 +90,7 @@ Widget rosemary(BuildContext context, VoidCallback onTrack) {
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Image.asset('assets/ROSEMARY.jpg', width: 150, height: 150, fit: BoxFit.contain),
+            child: Image.asset('assets/Rosemary.jpg', width: 150, height: 150, fit: BoxFit.contain),
           ),
           const Text(
             plantName,
@@ -133,7 +133,7 @@ Widget dittany(BuildContext context, VoidCallback onTrack) {
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Image.asset('assets/Leaf (1).png', width: 150, height: 150, fit: BoxFit.contain),
+            child: Image.asset('assets/Dittany.png', width: 150, height: 150, fit: BoxFit.contain),
           ),
           const Text(
             plantName,
@@ -216,7 +216,7 @@ Widget oregano(BuildContext context, VoidCallback onTrack) {
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Image.asset('assets/Leaf (1).png', width: 150, height: 150, fit: BoxFit.contain),
+            child: Image.asset('assets/Oregano.png', width: 150, height: 150, fit: BoxFit.contain),
           ),
           const Text(
             plantName,

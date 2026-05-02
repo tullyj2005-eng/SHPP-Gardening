@@ -177,6 +177,7 @@ class _HomePageState extends State<HomePage> {
         ];
 
         return GestureDetector(
+          behavior: HitTestBehavior.translucent,
           onTap: () {
             if (!_musicStarted && !ThemeManager.isMuted.value) {
               _musicStarted = true;

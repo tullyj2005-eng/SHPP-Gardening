@@ -53,11 +53,11 @@ class _QuizPlayViewState extends State<QuizPlayView> {
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        title: const Text("Quiz Complete!"),
+        title: const Text("Ολοκληρώσατε το Κουίζ!"),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text("You got $_score out of $total correct."),
+            Text("Πετύχατε $_score από τις $total σωστές απαντήσεις."),
             const SizedBox(height: 10),
             Text("+$xpGained XP", 
               style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.green)),
@@ -92,7 +92,7 @@ class _QuizPlayViewState extends State<QuizPlayView> {
                 Navigator.pop(context); 
               }
             },
-            child: const Text("Finish"),
+            child: const Text("Τέλος"),
           ),
         ],
       ),
@@ -126,7 +126,7 @@ class _QuizPlayViewState extends State<QuizPlayView> {
                 color: Colors.green,
               ),
               const SizedBox(height: 10),
-              Text("Question ${_currentIndex + 1} of ${questions.length}", 
+              Text("Ερώτηση ${_currentIndex + 1} από ${questions.length}", 
                    style: TextStyle(
                     color: Theme.of(context).colorScheme.onSurfaceVariant, 
                     fontWeight: FontWeight.w500
@@ -146,7 +146,7 @@ class _QuizPlayViewState extends State<QuizPlayView> {
                   controller: _answerController,
                   autofocus: true,
                   decoration: const InputDecoration(
-                    labelText: "Your Answer",
+                    labelText: "Η απάντησή σας",
                     border: OutlineInputBorder(),
                     prefixIcon: Icon(Icons.edit),
                   ),

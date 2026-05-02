@@ -428,42 +428,46 @@ class _PlantCreatorTabState extends State<_PlantCreatorTab> {
         const SizedBox(height: 16),
 
         // --- IMAGE PICKER ---
-        GestureDetector(
-          onTap: _pickImage,
-          child: Container(
-            height: 160,
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.green.shade300, width: 2),
-              borderRadius: BorderRadius.circular(12),
-              color: Colors.green.shade50,
-            ),
-            child: _imageBytes != null
-                ? ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: Image.memory(_imageBytes!, fit: BoxFit.cover, width: double.infinity),
-                  )
-                : Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.add_photo_alternate_outlined, size: 48, color: Colors.green.shade400),
-                      const SizedBox(height: 8),
-                      Text("Πατήστε για επιλογή εικόνας (προαιρετικό)",
-                          style: TextStyle(color: Colors.green.shade600)),
-                    ],
+        // Using a real button so the browser allows the file dialog on gh-pages
+        Container(
+          height: 160,
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.green.shade300, width: 2),
+            borderRadius: BorderRadius.circular(12),
+            color: Colors.green.shade50,
+          ),
+          child: _imageBytes != null
+              ? Stack(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: Image.memory(_imageBytes!, fit: BoxFit.cover,
+                          width: double.infinity, height: double.infinity),
+                    ),
+                    Positioned(
+                      top: 8, right: 8,
+                      child: GestureDetector(
+                        onTap: () => setState(() { _imageBytes = null; _imageFileName = null; }),
+                        child: Container(
+                          decoration: const BoxDecoration(color: Colors.black54, shape: BoxShape.circle),
+                          child: const Icon(Icons.close, color: Colors.white, size: 20),
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              : Center(
+                  child: ElevatedButton.icon(
+                    onPressed: _pickImage,
+                    icon: const Icon(Icons.add_photo_alternate_outlined),
+                    label: const Text("Επιλογή εικόνας (προαιρετικό)"),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green.shade600,
+                      foregroundColor: Colors.white,
+                    ),
                   ),
-          ),
+                ),
         ),
-        if (_imageBytes != null) ...[
-          const SizedBox(height: 6),
-          TextButton.icon(
-            onPressed: () => setState(() {
-              _imageBytes = null;
-              _imageFileName = null;
-            }),
-            icon: const Icon(Icons.close, size: 16, color: Colors.redAccent),
-            label: const Text("Αφαίρεση εικόνας", style: TextStyle(color: Colors.redAccent)),
-          ),
-        ],
 
         const SizedBox(height: 24),
 

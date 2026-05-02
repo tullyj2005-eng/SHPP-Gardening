@@ -309,7 +309,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   );
                 }
               },
-              child: Text(code == "---" ? "Δημιουργία" : "Refresh"),
+              child: Text(code == "---" ? "Δημιουργία" : "Ανανέωση"),
             ),
           ],
         );
